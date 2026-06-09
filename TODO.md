@@ -228,22 +228,22 @@
 > **UI는 읽고, 엔진이 결정한다.** 매매 로직 0. 유일한 쓰기는 운영 제어(ControlFlags).
 > 엔진↔웹 접점은 `artifacts/` 하나. `types/`를 타입으로만 import(재구현 금지).
 
-- [ ] **8.1 Next.js 앱 스캐폴드** — `web/`, `/backtest`·`/live` 라우트, API routes가 `artifacts/` 읽기·제어 쓰기. 차트는 lightweight-charts(TradingView)
-- [ ] **8.2 `/backtest` 페이지** (API 키 불필요, 지금 바로):
-      - [ ] 성과 패널(equity curve, 샤프·MDD·승률·거래수, 거래 마커)
-      - [ ] **in/out-of-sample 시각 분리** — OOS 보며 튜닝 못 하게(validation.md 2번)
-      - [ ] **다중검정 카운터**(`triesIndex` 크게) — "100개 중 5개는 운"
-      - [ ] 게이트 배지(GateResult 합격/사유)
-      - [ ] 국면 타임라인(membership 띠를 성과 위에 겹침)
-      - [ ] 런 비교(여러 BacktestRun 파라미터 diff + 성과 diff)
-- [ ] **8.3 `/live` 페이지** (먼저 mock LiveSnapshot 골격):
-      - [ ] 포트폴리오(보유·비중·평가손익·NAV·현금, 목표 vs 현재)
-      - [ ] 국면·적극도(membership·label·적극도 스칼라·브레이크 상태)
-      - [ ] 주문(미체결·최근 체결·의사결정 로그), 모드 배지(크게)
-      - [ ] **제어(유일한 쓰기)**: 킬스위치, 일시정지, 모드 전환 요청(requestedMode)
-- [ ] **8.4 제어 채널 안전** — 엔진이 폴링해 따름(웹이 엔진 직접 호출 안 함), 킬스위치 fail-safe, 종목·비중·주문 지정 경로 없음
+- [x] **8.1 Next.js 앱 스캐폴드** — `web/`, `/backtest`·`/live` 라우트, API routes가 `artifacts/` 읽기·제어 쓰기. 차트는 lightweight-charts(TradingView)
+- [x] **8.2 `/backtest` 페이지** (API 키 불필요, 지금 바로):
+      - [x] 성과 패널(equity curve, 샤프·MDD·승률·거래수, 거래 마커)
+      - [x] **in/out-of-sample 시각 분리** — OOS 보며 튜닝 못 하게(validation.md 2번)
+      - [x] **다중검정 카운터**(`triesIndex` 크게) — "100개 중 5개는 운"
+      - [x] 게이트 배지(GateResult 합격/사유)
+      - [x] 국면 타임라인(membership 띠를 성과 위에 겹침)
+      - [x] 런 비교(여러 BacktestRun 파라미터 diff + 성과 diff)
+- [x] **8.3 `/live` 페이지** (먼저 mock LiveSnapshot 골격):
+      - [x] 포트폴리오(보유·비중·평가손익·NAV·현금, 목표 vs 현재)
+      - [x] 국면·적극도(membership·label·적극도 스칼라·브레이크 상태)
+      - [x] 주문(미체결·최근 체결·의사결정 로그), 모드 배지(크게)
+      - [x] **제어(유일한 쓰기)**: 킬스위치, 일시정지, 모드 전환 요청(requestedMode)
+- [x] **8.4 제어 채널 안전** — 엔진이 폴링해 따름(웹이 엔진 직접 호출 안 함), 킬스위치 fail-safe, 종목·비중·주문 지정 경로 없음
 - [ ] **8.5 실데이터 배선** — 토스 키 확보 후 mock → 실 LiveSnapshot 교체
-- [ ] **8.6 E2E(Playwright)** — `/backtest` 렌더, 킬스위치 토글이 ControlFlags를 뒤집는지
+- [x] **8.6 E2E(Playwright)** — `/backtest` 렌더, 킬스위치 토글이 ControlFlags를 뒤집는지
 
 ---
 

@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+web/node_modules/
+
+# build output
+dist/
+web/.next/
+web/out/
+*.tsbuildinfo
+
+# test / coverage
+coverage/
+
+# secrets — 절대 커밋 금지
+.env
+.env.*
+!.env.example
+
+# 실거래 스냅샷·제어 플래그는 커밋하지 않음 (실데이터)
+artifacts/live/*
+!artifacts/live/.gitkeep
+
+# 백테스트 데이터 캐시
+.cache/
+data-cache/
+
+# OS / editor
+.DS_Store
+*.log
+.vscode/
+.idea/

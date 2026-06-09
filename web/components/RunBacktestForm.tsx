@@ -20,6 +20,25 @@ const SECTOR_ETFS = [
   "XLB",
 ] as const;
 
+/** 미국 대표 대형주 예시(직접 입력칸 빠른 채우기). 개별주는 생존편향 주의. */
+const MEGACAP_EXAMPLE = "SPY, QQQ, AAPL, MSFT, NVDA, GOOGL, AMZN, META, TSLA, AVGO, JPM, V, UNH";
+
+const TICKER_RE = /^[A-Z0-9^.\-]+$/;
+
+/** 쉼표·공백 구분 → 대문자·검증·중복 제거 */
+function parseTickers(raw: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const t of raw.split(/[,\s]+/)) {
+    const sym = t.trim().toUpperCase();
+    if (sym && TICKER_RE.test(sym) && !seen.has(sym)) {
+      seen.add(sym);
+      out.push(sym);
+    }
+  }
+  return out;
+}
+
 export interface RunBacktestFormProps {
   /** 실행 성공 시 새 BacktestRun id 를 부모에 전달(목록 새로고침 + 선택) */
   onComplete: (id: string) => void;
@@ -29,6 +48,7 @@ export function RunBacktestForm({ onComplete }: RunBacktestFormProps) {
   const [universe, setUniverse] = useState<Set<string>>(
     () => new Set(SECTOR_ETFS),
   );
+  const [customTickers, setCustomTickers] = useState("");
   const [from, setFrom] = useState("2018-01-01");
   const [to, setTo] = useState("2024-12-31");
   const [rebalance, setRebalance] = useState("20");
@@ -44,12 +64,26 @@ export function RunBacktestForm({ onComplete }: RunBacktestFormProps) {
     });
   }
 
+  // 최종 유니버스 = 체크된 섹터 ETF ∪ 직접 입력 티커
+  const custom = parseTickers(customTickers);
+  const finalUniverse = (() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const s of [...SECTOR_ETFS.filter((s) => universe.has(s)), ...custom]) {
+      if (!seen.has(s)) {
+        seen.add(s);
+        out.push(s);
+      }
+    }
+    return out;
+  })();
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const selected = SECTOR_ETFS.filter((s) => universe.has(s));
+    const selected = finalUniverse;
     if (selected.length === 0) {
-      setError("유니버스에서 최소 1개 섹터 ETF를 선택하세요.");
+      setError("유니버스를 최소 1개 선택하거나 입력하세요(섹터 ETF 체크 또는 직접 입력).");
       return;
     }
     setRunning(true);
@@ -100,6 +134,45 @@ export function RunBacktestForm({ onComplete }: RunBacktestFormProps) {
               <span className="mono">{s}</span>
             </label>
           ))}
+        </div>
+
+        <div className="label dim" style={{ margin: "14px 0 6px" }}>
+          직접 입력 (쉼표/공백 구분, 미국 티커 — 예: SPY, QQQ, AAPL)
+        </div>
+        <input
+          type="text"
+          value={customTickers}
+          onChange={(e) => setCustomTickers(e.target.value)}
+          placeholder="SPY, QQQ, AAPL, MSFT, NVDA …"
+          aria-label="custom tickers"
+          style={{ width: "100%" }}
+        />
+        <div className="row" style={{ gap: 10, marginTop: 6, alignItems: "center" }}>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => setCustomTickers(MEGACAP_EXAMPLE)}
+            style={{ fontSize: 12 }}
+          >
+            대형주 예시 채우기
+          </button>
+          {customTickers.trim() ? (
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setCustomTickers("")}
+              style={{ fontSize: 12 }}
+            >
+              직접 입력 지우기
+            </button>
+          ) : null}
+        </div>
+        <p className="dim" style={{ fontSize: 11, marginTop: 6 }}>
+          ⚠ 개별주(오늘의 승자)로 과거를 돌리면 생존편향이 낀다 — 결과가 부풀려질 수
+          있으니 OOS·게이트로 판단하세요. 편향 적은 출발점은 섹터/지수 ETF(SPY·QQQ).
+        </p>
+        <div className="label dim" style={{ marginTop: 8 }} data-testid="effective-universe">
+          적용 유니버스({finalUniverse.length}): <span className="mono">{finalUniverse.join(", ") || "—"}</span>
         </div>
 
         <div className="row" style={{ gap: 20, marginTop: 14, flexWrap: "wrap" }}>

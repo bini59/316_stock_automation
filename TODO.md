@@ -23,15 +23,15 @@
 
 목표: TypeScript 헤드리스 엔진이 돌 수 있는 최소 환경. UI/토스 없이도 빌드·테스트가 통과.
 
-- [ ] **0.1 패키지 초기화** — `package.json` (name, `"type": "module"`, scripts: `build`/`test`/`test:watch`/`lint`/`typecheck`)
-- [ ] **0.2 TypeScript 설정** — `tsconfig.json` (`strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`, `target: ES2022`, `moduleResolution: "bundler"|"node16"`). strict 옵션은 look-ahead/계약 위반을 컴파일 타임에 잡는 1차 방어선.
-- [ ] **0.3 테스트 러너** — Vitest 설치·설정 (`vitest.config.ts`, coverage 임계 80% 설정). 단위 테스트가 검증 프레임워크의 핵심이므로 1순위.
-- [ ] **0.4 린트·포맷** — ESLint + Prettier (글로벌 hook이 prettier/tsc를 후처리하므로 충돌 없게 정렬).
-- [ ] **0.5 폴더 골격 생성** — `project-structure.md` 기준으로 빈 디렉토리 + `index.ts`:
+- [x] **0.1 패키지 초기화** — `package.json` (name, `"type": "module"`, scripts: `build`/`test`/`test:watch`/`lint`/`typecheck`)
+- [x] **0.2 TypeScript 설정** — `tsconfig.json` (`strict: true`, `noUncheckedIndexedAccess: true`, `exactOptionalPropertyTypes: true`, `target: ES2022`, `moduleResolution: "bundler"|"node16"`). strict 옵션은 look-ahead/계약 위반을 컴파일 타임에 잡는 1차 방어선.
+- [x] **0.3 테스트 러너** — Vitest 설치·설정 (`vitest.config.ts`, coverage 임계 80% 설정). 단위 테스트가 검증 프레임워크의 핵심이므로 1순위.
+- [x] **0.4 린트·포맷** — ESLint + Prettier (글로벌 hook이 prettier/tsc를 후처리하므로 충돌 없게 정렬).
+- [x] **0.5 폴더 골격 생성** — `project-structure.md` 기준으로 빈 디렉토리 + `index.ts`:
       `src/{types,data,engine,validation,strategies,regime,sentiment,meta,broker,pipeline}/`, `artifacts/{backtests,live}/`
-- [ ] **0.6 `.gitignore`** — `node_modules`, `dist`, `artifacts/live/*`(실거래 스냅샷은 커밋 안 함), `.env*`
-- [ ] **0.7 비밀 관리 골격** — `.env.example` (토스 `TOSS_CLIENT_ID`/`TOSS_CLIENT_SECRET`/`TOSS_ACCOUNT_SEQ` 플레이스홀더만). 실제 키는 절대 커밋 금지.
-- [ ] **0.8 git 초기화** — repo init, 통합 브랜치(`main`) + 작업 브랜치 컨벤션(`feature/...`) 확인.
+- [x] **0.6 `.gitignore`** — `node_modules`, `dist`, `artifacts/live/*`(실거래 스냅샷은 커밋 안 함), `.env*`
+- [x] **0.7 비밀 관리 골격** — `.env.example` (토스 `TOSS_CLIENT_ID`/`TOSS_CLIENT_SECRET`/`TOSS_ACCOUNT_SEQ` 플레이스홀더만). 실제 키는 절대 커밋 금지.
+- [x] **0.8 git 초기화** — repo init, 통합 브랜치(`main`) + 작업 브랜치 컨벤션(`feature/...`) 확인.
 
 **완료 기준**: `npm run typecheck`, `npm test`(빈 통과), `npm run build`가 모두 성공.
 
@@ -42,19 +42,19 @@
 > 설계 원본: `docs/coding/interfaces.md` + 각 레이어 문서. **계약을 새로 짜지 말고 문서 타입을 그대로 구현.**
 > 한 파일 한 관심사. 변경 시 영향 범위가 크므로 이 단계에서 최대한 확정.
 
-- [ ] **1.1 `types/market.ts`** — `Bar`(timestamp/OHLCV), `PriceSeries = readonly Bar[]`
-- [ ] **1.2 `types/strategy.ts`** — `SignalAction`, `Signal`, `Strategy`(단일종목 atom, `next(history)`), 그리고 확장: `UniverseHistory`, `StrategyProposal`, `RegimeStrategy`(`family`/`regimeAffinity`/`propose`)
-- [ ] **1.3 `types/result.ts`** — `Trade`(비용 차감 후 pnl), `Metrics`(totalReturn/sharpe/maxDrawdown/winRate/tradeCount), `BacktestResult`(equityCurve/trades/metrics)
-- [ ] **1.4 `types/regime.ts`** — `RegimeLabel`, `RegimeState`(trend/volatility/trendQuality/membership/label/confidence), `MacroContext`, `RegimeClassifier` 인터페이스
-- [ ] **1.5 `types/sentiment.ts`** — `SentimentSignal`, `RiskInputs`, `AggressivenessConfig`, `AggressivenessResult`, `computeAggressiveness` 시그니처
-- [ ] **1.6 `types/allocation.ts`** — `AllocationConfig`, `AllocationInput`, `MetaAllocation`, `allocate` 시그니처
-- [ ] **1.7 `types/account.ts`** — `Holding`, `AccountState`(baseCurrency `"USD"`, NAV = 현금+유니버스 보유 평가액)
-- [ ] **1.8 `types/order.ts`** — `Order`(symbol/side/notional/reason), `OrderResult`
-- [ ] **1.9 `types/broker-port.ts`** — `AccountSource`, `MarketDataSource`, `OrderExecutor`, `ExecMode`
-- [ ] **1.10 `types/gate.ts`** — `GateCriteria`, `GateResult`
-- [ ] **1.11 `types/artifact.ts`** — `BacktestRun`, `LiveSnapshot`, `ControlFlags` (대시보드와 shape 정확히 일치 — `dashboards.md` 2절)
-- [ ] **1.12 `types/index.ts`** — 배럴 export
-- [ ] **1.13 look-ahead 타입 가드 검토** — 전략/분류기가 전체 시계열에 접근할 경로가 타입상 없는지 확인(`next`/`classify`/`propose`는 "현재까지" history만 받음).
+- [x] **1.1 `types/market.ts`** — `Bar`(timestamp/OHLCV), `PriceSeries = readonly Bar[]`
+- [x] **1.2 `types/strategy.ts`** — `SignalAction`, `Signal`, `Strategy`(단일종목 atom, `next(history)`), 그리고 확장: `UniverseHistory`, `StrategyProposal`, `RegimeStrategy`(`family`/`regimeAffinity`/`propose`)
+- [x] **1.3 `types/result.ts`** — `Trade`(비용 차감 후 pnl), `Metrics`(totalReturn/sharpe/maxDrawdown/winRate/tradeCount), `BacktestResult`(equityCurve/trades/metrics)
+- [x] **1.4 `types/regime.ts`** — `RegimeLabel`, `RegimeState`(trend/volatility/trendQuality/membership/label/confidence), `MacroContext`, `RegimeClassifier` 인터페이스
+- [x] **1.5 `types/sentiment.ts`** — `SentimentSignal`, `RiskInputs`, `AggressivenessConfig`, `AggressivenessResult`, `computeAggressiveness` 시그니처
+- [x] **1.6 `types/allocation.ts`** — `AllocationConfig`, `AllocationInput`, `MetaAllocation`, `allocate` 시그니처
+- [x] **1.7 `types/account.ts`** — `Holding`, `AccountState`(baseCurrency `"USD"`, NAV = 현금+유니버스 보유 평가액)
+- [x] **1.8 `types/order.ts`** — `Order`(symbol/side/notional/reason), `OrderResult`
+- [x] **1.9 `types/broker-port.ts`** — `AccountSource`, `MarketDataSource`, `OrderExecutor`, `ExecMode`
+- [x] **1.10 `types/gate.ts`** — `GateCriteria`, `GateResult`
+- [x] **1.11 `types/artifact.ts`** — `BacktestRun`, `LiveSnapshot`, `ControlFlags` (대시보드와 shape 정확히 일치 — `dashboards.md` 2절)
+- [x] **1.12 `types/index.ts`** — 배럴 export
+- [x] **1.13 look-ahead 타입 가드 검토** — 전략/분류기가 전체 시계열에 접근할 경로가 타입상 없는지 확인(`next`/`classify`/`propose`는 "현재까지" history만 받음).
 
 **완료 기준**: 타입만으로 컴파일 통과. 전 레이어 함수 시그니처가 문서와 1:1.
 **검증**: `quant-validator`에게 "레이어 간 타입 계약 정합성 + look-ahead 차단 가능성" 교차검토 요청.

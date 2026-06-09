@@ -16,6 +16,10 @@ export type {
   RegimeTimelinePoint,
 } from "../../src/types/artifact";
 
+// 튜닝 산출물(엔진 pipeline). 웹은 비교 테이블을 그리기 위해 읽기만 한다.
+export type { TuningArtifact } from "../../src/pipeline/writeArtifact";
+export type { TuneResult, TuneParams } from "../../src/pipeline/tune";
+
 export type { BacktestResult, Trade, Metrics } from "../../src/types/result";
 
 export type { GateResult, GateCriteria } from "../../src/types/gate";

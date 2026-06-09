@@ -1,0 +1,34 @@
+{
+  "id": "tune-sample-001",
+  "createdAt": 1704067200000,
+  "universe": ["XLK", "XLF", "XLV"],
+  "dateRange": { "from": 1514764800000, "to": 1735603200000 },
+  "bestRunId": "run-momentum-bull-001",
+  "result": {
+    "best": {
+      "targetVol": 0.18,
+      "maxWeightPerFamily": 0.8,
+      "maxWeightPerSymbol": 0.3,
+      "rebalanceEvery": 20
+    },
+    "triesIndex": 24,
+    "ratio": 0.7,
+    "inSampleEnd": 1652918400000,
+    "tuned": {
+      "full": { "totalReturn": 0.62, "sharpe": 1.05, "maxDrawdown": 0.18, "winRate": 0.55, "tradeCount": 140 },
+      "inSample": { "totalReturn": 0.48, "sharpe": 1.62, "maxDrawdown": 0.12, "winRate": 0.6, "tradeCount": 90 },
+      "oos": { "totalReturn": 0.14, "sharpe": 0.38, "maxDrawdown": 0.21, "winRate": 0.49, "tradeCount": 50 }
+    },
+    "baseline": {
+      "full": { "totalReturn": 0.45, "sharpe": 0.82, "maxDrawdown": 0.22, "winRate": 0.52, "tradeCount": 120 },
+      "inSample": { "totalReturn": 0.3, "sharpe": 1.1, "maxDrawdown": 0.15, "winRate": 0.55, "tradeCount": 75 },
+      "oos": { "totalReturn": 0.12, "sharpe": 0.45, "maxDrawdown": 0.2, "winRate": 0.5, "tradeCount": 45 }
+    },
+    "buyHold": { "totalReturn": 0.95, "sharpe": 0.9, "maxDrawdown": 0.34 },
+    "gate": {
+      "passed": false,
+      "reasons": ["OOS 샤프 0.38 < 다중검정 보정 임계 0.71 (tries=24)"]
+    },
+    "overfitGap": 1.24
+  }
+}

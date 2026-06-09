@@ -16,6 +16,7 @@ import type {
   LiveSnapshot,
   ControlFlags,
   LiveMode,
+  TuningArtifact,
 } from "./engine-types";
 
 /**
@@ -30,6 +31,7 @@ function artifactsRoot(): string {
 }
 
 const backtestsDir = () => path.join(artifactsRoot(), "backtests");
+const tuningDir = () => path.join(artifactsRoot(), "tuning");
 const liveDir = () => path.join(artifactsRoot(), "live");
 const controlPath = () => path.join(liveDir(), "control.json");
 const livePath = () => path.join(liveDir(), "snapshot.json");
@@ -97,6 +99,72 @@ function isValidRun(r: unknown): r is BacktestRun {
     Array.isArray((x.result as Record<string, unknown>).equityCurve) &&
     typeof x.gate === "object" &&
     x.gate !== null
+  );
+}
+
+/** tuning/ 의 모든 TuningArtifact 를 createdAt 내림차순으로. */
+export async function listTuningArtifacts(): Promise<TuningArtifact[]> {
+  let entries: string[];
+  try {
+    entries = await fs.readdir(tuningDir());
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") return [];
+    console.error("[artifacts] failed to list tuning:", err);
+    return [];
+  }
+
+  const jsonFiles = entries.filter(
+    (f) => f.endsWith(".json") && !f.startsWith("."),
+  );
+
+  const items = await Promise.all(
+    jsonFiles.map((f) =>
+      readJsonSafe<TuningArtifact>(path.join(tuningDir(), f)),
+    ),
+  );
+
+  return items
+    .filter((t): t is TuningArtifact => t !== null && isValidTuning(t))
+    .sort((a, b) => b.createdAt - a.createdAt);
+}
+
+/** id 로 단일 TuningArtifact. 없으면 null. */
+export async function getTuningArtifact(
+  id: string,
+): Promise<TuningArtifact | null> {
+  if (!/^[A-Za-z0-9._-]+$/.test(id)) return null; // path traversal 차단
+  const item = await readJsonSafe<TuningArtifact>(
+    path.join(tuningDir(), `${id}.json`),
+  );
+  if (item && isValidTuning(item)) return item;
+  const all = await listTuningArtifacts();
+  return all.find((t) => t.id === id) ?? null;
+}
+
+/** 최소 shape 검증 — 경계면 불일치(필수 필드 누락)를 런타임에 거른다. */
+function isValidTuning(t: unknown): t is TuningArtifact {
+  if (typeof t !== "object" || t === null) return false;
+  const x = t as Record<string, unknown>;
+  if (
+    typeof x.id !== "string" ||
+    typeof x.createdAt !== "number" ||
+    typeof x.bestRunId !== "string" ||
+    typeof x.result !== "object" ||
+    x.result === null
+  ) {
+    return false;
+  }
+  const r = x.result as Record<string, unknown>;
+  return (
+    typeof r.best === "object" &&
+    r.best !== null &&
+    typeof r.triesIndex === "number" &&
+    typeof r.gate === "object" &&
+    r.gate !== null &&
+    typeof r.tuned === "object" &&
+    typeof r.baseline === "object" &&
+    typeof r.buyHold === "object"
   );
 }
 

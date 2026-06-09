@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import type { BacktestRun } from "@/lib/engine-types";
 import { pct, signedPct, num, int, dateOnly } from "@/lib/format";
@@ -10,6 +10,17 @@ import { TriesCounter } from "@/components/TriesCounter";
 import { SampleMetrics } from "@/components/SampleMetrics";
 import { RegimeTimeline } from "@/components/RegimeTimeline";
 import { RunCompare } from "@/components/RunCompare";
+import { RunBacktestForm } from "@/components/RunBacktestForm";
+import { TuningPanel } from "@/components/TuningPanel";
+
+type Tab = "backtest" | "tuning";
+
+/** ?run=<id> 딥링크(튜닝 패널의 bestRun 링크 등)를 읽는다. */
+function initialRunFromUrl(): string | null {
+  if (typeof window === "undefined") return null;
+  const v = new URLSearchParams(window.location.search).get("run");
+  return v && /^[A-Za-z0-9._-]+$/.test(v) ? v : null;
+}
 
 // lightweight-charts 는 브라우저 전용 → SSR 비활성.
 const EquityChart = dynamic(
@@ -22,25 +33,38 @@ export function BacktestClient() {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
+  const [tab, setTab] = useState<Tab>("backtest");
+
+  /** 목록을 새로고침하고, 선택할 id 가 주어지면 그 런을 선택한다. */
+  const refresh = useCallback(async (selectId?: string | null) => {
+    try {
+      const r = await fetch("/api/backtests");
+      const data: { runs?: BacktestRun[]; error?: string } = await r.json();
+      if (data.error) setError(data.error);
+      else setError(null);
+      const list = data.runs ?? [];
+      setRuns(list);
+      setSelectedId((prev) => {
+        if (selectId && list.some((x) => x.id === selectId)) return selectId;
+        if (prev && list.some((x) => x.id === prev)) return prev;
+        return list[0]?.id ?? null;
+      });
+    } catch (e) {
+      setError(String(e));
+    }
+  }, []);
 
   useEffect(() => {
-    let alive = true;
-    fetch("/api/backtests")
-      .then((r) => r.json())
-      .then((data: { runs?: BacktestRun[]; error?: string }) => {
-        if (!alive) return;
-        if (data.error) setError(data.error);
-        const list = data.runs ?? [];
-        setRuns(list);
-        if (list.length > 0 && list[0]) setSelectedId(list[0].id);
-      })
-      .catch((e) => {
-        if (alive) setError(String(e));
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
+    void refresh(initialRunFromUrl());
+  }, [refresh]);
+
+  /** 새 백테스트 실행 완료 시: 목록 새로고침 + 새 런 선택. */
+  const handleRunComplete = useCallback(
+    (id: string) => {
+      void refresh(id);
+    },
+    [refresh],
+  );
 
   const selected = useMemo(
     () => runs?.find((r) => r.id === selectedId) ?? null,
@@ -69,29 +93,58 @@ export function BacktestClient() {
         보정 규율만 시각적으로 강제한다.
       </p>
 
+      <div className="tabs" role="tablist">
+        <button
+          role="tab"
+          aria-selected={tab === "backtest"}
+          className={`tab ${tab === "backtest" ? "active" : ""}`}
+          onClick={() => setTab("backtest")}
+          data-testid="tab-backtest"
+        >
+          백테스트
+        </button>
+        <button
+          role="tab"
+          aria-selected={tab === "tuning"}
+          className={`tab ${tab === "tuning" ? "active" : ""}`}
+          onClick={() => setTab("tuning")}
+          data-testid="tab-tuning"
+        >
+          튜닝
+        </button>
+      </div>
+
       {error ? (
         <div className="banner danger">읽기 오류: {error}</div>
       ) : null}
 
-      {runs === null ? (
-        <div className="empty">불러오는 중…</div>
-      ) : runs.length === 0 ? (
-        <EmptyState />
+      {tab === "tuning" ? (
+        <TuningPanel />
       ) : (
         <>
-          <RunPicker
-            runs={runs}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            compareIds={compareIds}
-            onToggleCompare={toggleCompare}
-          />
-          {selected ? <RunDetail run={selected} /> : null}
+          <RunBacktestForm onComplete={handleRunComplete} />
 
-          <div className="card">
-            <h2 className="card-title">런 비교 (params diff + 성과 diff)</h2>
-            <RunCompare runs={compareRuns} />
-          </div>
+          {runs === null ? (
+            <div className="empty">불러오는 중…</div>
+          ) : runs.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <>
+              <RunPicker
+                runs={runs}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                compareIds={compareIds}
+                onToggleCompare={toggleCompare}
+              />
+              {selected ? <RunDetail run={selected} /> : null}
+
+              <div className="card">
+                <h2 className="card-title">런 비교 (params diff + 성과 diff)</h2>
+                <RunCompare runs={compareRuns} />
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

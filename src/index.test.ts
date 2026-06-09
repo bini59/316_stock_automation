@@ -48,6 +48,7 @@ describe("CLI run-backtest (E2E, 파일 산출)", () => {
 
     // runBacktestCommand는 기본 artifacts/backtests에 쓴다 — 여기선 반환 경로만 확인 후 정리
     outFile = await runBacktestCommand({
+      source: "csv",
       "data-dir": dir,
       benchmark: "SPY",
       universe: "XLK,XLF",

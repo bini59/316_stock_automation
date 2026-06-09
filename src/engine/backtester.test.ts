@@ -159,6 +159,32 @@ describe("backtestPortfolio 다중종목", () => {
     expect(rebalances).toBeGreaterThan(0); // 호출은 되지만
   });
 
+  it("★ churn 억제: 고정 target + 미세 드리프트에서 무거래 밴드가 거래 폭증을 막는다", () => {
+    // +0.1%/bar로 천천히 오르는 단일 자산, target 고정 0.5
+    const closes = Array.from({ length: 40 }, (_, i) => 100 * (1 + 0.001 * i));
+    const uni: UniverseHistory = { SPY: series(closes) };
+    const fixedTarget = () => ({ SPY: 0.5 });
+
+    const withBand = backtestPortfolio({
+      universe: uni,
+      broker: zeroCost(),
+      initialCapital: 10000,
+      targetWeights: fixedTarget,
+    });
+    const noBand = backtestPortfolio({
+      universe: uni,
+      broker: zeroCost(),
+      initialCapital: 10000,
+      minTradeFraction: 0,
+      minTradeNotional: 0,
+      targetWeights: fixedTarget,
+    });
+
+    // 기본 밴드(0.5%)가 드리프트 churn을 크게 줄인다
+    expect(noBand.trades.length).toBeGreaterThan(10);
+    expect(withBand.trades.length).toBeLessThan(noBand.trades.length);
+  });
+
   it("★ look-ahead: targetWeights는 i+1개 바 슬라이스만 받는다", () => {
     const seenLens: number[] = [];
     backtestPortfolio({

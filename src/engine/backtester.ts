@@ -82,8 +82,14 @@ export interface PortfolioBacktestInput {
   targetWeights: (histories: UniverseHistory, i: number) => Readonly<Record<string, number>>;
   /** 리밸런싱 주기(바 단위). 예: 5 = 주간(영업일). 기본 1 */
   rebalanceEvery?: number;
-  /** 무거래 밴드: 이 금액 미만 델타는 무시(churn 방지) */
+  /** 무거래 밴드(절대 금액): 이 금액 미만 델타는 무시(churn 방지). 기본 0 */
   minTradeNotional?: number;
+  /**
+   * 무거래 밴드(NAV 비례): 매 리밸런스에서 equity×이 비율 미만 델타는 무시.
+   * 가격 드리프트로 인한 미세 churn(비용 누수)을 막는다. 기본 0.005(0.5%).
+   * 실효 밴드 = max(minTradeNotional, minTradeFraction×equity).
+   */
+  minTradeFraction?: number;
 }
 
 /** 공통 타임라인 길이(가장 짧은 series 기준으로 안전하게) */
@@ -119,6 +125,7 @@ export function backtestPortfolio(input: PortfolioBacktestInput): BacktestResult
   const { universe, broker, initialCapital } = input;
   const rebalanceEvery = Math.max(1, input.rebalanceEvery ?? 1);
   const minTradeNotional = input.minTradeNotional ?? 0;
+  const minTradeFraction = input.minTradeFraction ?? 0.005;
 
   const n = timelineLength(universe);
   let state: PortfolioState = emptyPortfolio(initialCapital);
@@ -133,6 +140,8 @@ export function backtestPortfolio(input: PortfolioBacktestInput): BacktestResult
     if (i % rebalanceEvery === 0) {
       const equity = nav(state, prices);
       const target = input.targetWeights(sliceUniverse(universe, i), i);
+      // 무거래 밴드: 가격 드리프트로 인한 미세 churn(비용 누수) 차단
+      const band = Math.max(minTradeNotional, minTradeFraction * equity);
 
       const symbols = new Set<string>([
         ...Object.keys(target),
@@ -147,7 +156,7 @@ export function backtestPortfolio(input: PortfolioBacktestInput): BacktestResult
         const targetValue = (target[sym] ?? 0) * equity;
         const currentValue = (state.positions[sym]?.quantity ?? 0) * price;
         const delta = targetValue - currentValue;
-        if (Math.abs(delta) < minTradeNotional) continue;
+        if (Math.abs(delta) < band) continue;
         deltas.push({ sym, delta, price });
       }
 

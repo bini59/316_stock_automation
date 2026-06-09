@@ -50,18 +50,20 @@ export function annualizedSharpe(
   return (mean(returns) / sd) * Math.sqrt(periodsPerYear);
 }
 
-/** 최대 낙폭 0..1 (고점 대비 최대 하락폭). 단조 상승이면 0. */
+/**
+ * 최대 낙폭 0..1 (고점 대비 최대 하락폭). 단조 상승이면 0.
+ * 계약(0..1)을 코드로 강제: equity가 0 이하로 가도(자본 소진) 1로 클램프하고,
+ * 음수 영역에서의 추가 하락도 손실 은폐 없이 1로 본다(레버리지·숏 도입 대비).
+ */
 export function maxDrawdown(equityCurve: readonly number[]): number {
   let peak = -Infinity;
   let mdd = 0;
   for (const v of equityCurve) {
     if (v > peak) peak = v;
-    if (peak > 0) {
-      const dd = (peak - v) / peak;
-      if (dd > mdd) mdd = dd;
-    }
+    const dd = peak > 0 ? (peak - v) / peak : v < peak ? 1 : 0;
+    if (dd > mdd) mdd = dd;
   }
-  return mdd;
+  return Math.min(1, Math.max(0, mdd));
 }
 
 export function computeMetrics(

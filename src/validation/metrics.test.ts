@@ -30,6 +30,13 @@ describe("maxDrawdown", () => {
     expect(maxDrawdown([])).toBe(0);
     expect(maxDrawdown([100])).toBe(0);
   });
+  it("계약 강제: 자본 소진(0 이하)이어도 1로 클램프(>1 금지)", () => {
+    expect(maxDrawdown([100, 0])).toBe(1);
+    expect(maxDrawdown([100, -50])).toBe(1);
+  });
+  it("계약 강제: 음수 영역 추가 하락도 손실 은폐 없이 1", () => {
+    expect(maxDrawdown([-10, -20])).toBe(1);
+  });
 });
 
 describe("annualizedSharpe", () => {

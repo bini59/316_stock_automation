@@ -42,4 +42,9 @@ export type {
   OrderExecutor,
 } from "./broker-port";
 export type { GateCriteria, GateResult, EvaluateGate } from "./gate";
-export type { BacktestRun, LiveSnapshot, ControlFlags } from "./artifact";
+export type {
+  BacktestRun,
+  LiveSnapshot,
+  ControlFlags,
+  RegimeTimelinePoint,
+} from "./artifact";

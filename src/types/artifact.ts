@@ -8,9 +8,17 @@
 import type { BacktestResult } from "./result";
 import type { GateResult } from "./gate";
 import type { AccountState } from "./account";
-import type { RegimeState } from "./regime";
+import type { RegimeState, RegimeLabel } from "./regime";
 import type { Order } from "./order";
 import type { LiveMode } from "./broker-port";
+
+/** 시점별 국면·적극도 (대시보드 국면 타임라인 띠용) */
+export interface RegimeTimelinePoint {
+  timestamp: number;
+  membership: Readonly<Record<RegimeLabel, number>>;
+  label: RegimeLabel;
+  aggressiveness: number;
+}
 
 export interface BacktestRun {
   id: string;
@@ -29,6 +37,8 @@ export interface BacktestRun {
   gate: GateResult;
   /** 이 전략에 대해 몇 번째 시도인지 (다중검정) */
   triesIndex: number;
+  /** 리밸런스 시점별 국면·적극도 (대시보드 국면 타임라인 오버레이용, 선택) */
+  regimePath?: readonly RegimeTimelinePoint[];
 }
 
 export interface LiveSnapshot {

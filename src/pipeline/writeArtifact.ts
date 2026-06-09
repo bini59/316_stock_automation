@@ -52,6 +52,7 @@ export function buildBacktestRun(
     oosResult: split.oosResult,
     gate,
     triesIndex: opts.triesIndex,
+    regimePath: split.regimePath,
   };
 }
 

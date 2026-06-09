@@ -70,6 +70,14 @@ export function backtest(
   return { equityCurve, trades, metrics: computeMetrics(equityCurve, trades) };
 }
 
+/** 리밸런스 시점의 포트폴리오 컨텍스트(낙폭 브레이크 등 적극도 입력용) */
+export interface RebalanceContext {
+  /** 현재 NAV(체결 전) */
+  equity: number;
+  /** 현재 낙폭 0..1 (러닝 피크 대비) — sentiment ddBrake 입력 */
+  drawdown: number;
+}
+
 /** 다중종목 백테스터 입력. universe의 모든 series는 동일 타임라인(인덱스 정렬). */
 export interface PortfolioBacktestInput {
   universe: UniverseHistory;
@@ -77,9 +85,14 @@ export interface PortfolioBacktestInput {
   initialCapital: number;
   /**
    * 목표비중 산출. histories는 "현재 시점까지" 슬라이스(look-ahead 차단),
-   * i는 현재 바 인덱스. 합 ≤ 1 (나머지는 현금). 파이프라인이 전략 스택을 주입.
+   * i는 현재 바 인덱스, ctx는 현재 포트폴리오 상태(equity/drawdown).
+   * 합 ≤ 1 (나머지는 현금). 파이프라인이 전략 스택을 주입.
    */
-  targetWeights: (histories: UniverseHistory, i: number) => Readonly<Record<string, number>>;
+  targetWeights: (
+    histories: UniverseHistory,
+    i: number,
+    ctx: RebalanceContext,
+  ) => Readonly<Record<string, number>>;
   /** 리밸런싱 주기(바 단위). 예: 5 = 주간(영업일). 기본 1 */
   rebalanceEvery?: number;
   /** 무거래 밴드(절대 금액): 이 금액 미만 델타는 무시(churn 방지). 기본 0 */
@@ -132,14 +145,18 @@ export function backtestPortfolio(input: PortfolioBacktestInput): BacktestResult
   const entryTimes: Record<string, number> = {};
   const equityCurve: number[] = [];
   const trades: Trade[] = [];
+  let peakEquity = -Infinity;
 
   for (let i = 0; i < n; i++) {
     const prices = pricesAt(universe, i);
     const ts = Object.values(universe)[0]?.[i]?.timestamp ?? i;
 
+    const equity = nav(state, prices);
+    if (equity > peakEquity) peakEquity = equity;
+    const drawdown = peakEquity > 0 ? Math.min(1, Math.max(0, (peakEquity - equity) / peakEquity)) : 0;
+
     if (i % rebalanceEvery === 0) {
-      const equity = nav(state, prices);
-      const target = input.targetWeights(sliceUniverse(universe, i), i);
+      const target = input.targetWeights(sliceUniverse(universe, i), i, { equity, drawdown });
       // 무거래 밴드: 가격 드리프트로 인한 미세 churn(비용 누수) 차단
       const band = Math.max(minTradeNotional, minTradeFraction * equity);
 

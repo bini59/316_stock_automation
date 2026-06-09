@@ -51,13 +51,31 @@ describe("allocate v1 — 패밀리 예산 상한", () => {
       (r.strategyAlloc.trend_b ?? 0) +
       (r.strategyAlloc.trend_c ?? 0) +
       (r.strategyAlloc.trend_d ?? 0);
-    // normalize: trend 0.5, meanrev 0.2 → 합 0.7 → trend 비중 0.5/0.7 ≈ 0.714
-    expect(trendShare).toBeCloseTo(0.5 / 0.7, 4);
-    expect(r.strategyAlloc.meanrev_x).toBeCloseTo(0.2 / 0.7, 4);
+    // QA H1 수정: 정규화 후 절대 상한 적용 → trend 합 = 정확히 0.5(cap), 차액은 현금.
+    // base 합 2.6: trend 각 0.6/2.6, meanrev 0.2/2.6. trend 합 0.923>0.5 → 0.5로 캡.
+    expect(trendShare).toBeCloseTo(0.5, 6);
+    expect(r.strategyAlloc.meanrev_x).toBeCloseTo(0.2 / 2.6, 4);
     expect(r.reasons).toContain("family trend capped");
     // meanrev는 capped되지 않아야 함
     expect(r.reasons).not.toContain("family meanrev capped");
-    expect(sum(r.strategyAlloc)).toBeCloseTo(1, 6);
+    // 차액(1 − 0.5 − 0.2/2.6)은 암묵적 현금 → strategyAlloc 합 < 1
+    expect(sum(r.strategyAlloc)).toBeCloseTo(0.5 + 0.2 / 2.6, 6);
+    expect(sum(r.strategyAlloc)).toBeLessThan(1);
+  });
+
+  it("★ QA H1: 책 전체가 한 패밀리여도 cap을 넘지 않는다(재정규화로 무력화 금지)", () => {
+    // trend 5개만 활성 → 정규화하면 합 1.0이지만 cap 0.5로 절대 제한, 나머지 현금
+    const proposals = [
+      prop("trend_a", 0.8, { AAA: 1 }),
+      prop("trend_b", 0.8, { BBB: 1 }),
+      prop("trend_c", 0.8, { CCC: 1 }),
+      prop("trend_d", 0.8, { DDD: 1 }),
+      prop("trend_e", 0.8, { EEE: 1 }),
+    ];
+    const r = allocate({ proposals }, cfg);
+    const trendShare = sum(r.strategyAlloc);
+    expect(trendShare).toBeCloseTo(0.5, 6); // 전부 trend → 합 = cap
+    expect(trendShare).toBeLessThan(1); // 나머지 0.5는 암묵적 현금
   });
 
   it("패밀리 합이 상한 이하면 축소하지 않는다", () => {

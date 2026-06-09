@@ -175,14 +175,14 @@
 
 > `meta-allocation.md` 7절 체인을 한 사이클 함수로 엮는다. 헤드리스 CLI-first.
 
-- [ ] **5.1 한 사이클 오케스트레이터** (`pipeline/cycle.ts`):
+- [x] **5.1 한 사이클 오케스트레이터** (`pipeline/cycle.ts`):
       `classify(history,ctx)` → `runPool(strategies,universe,regime)` → `allocate({proposals},cfg)` → `computeAggressiveness(risk,cfg,sentiment?)` → `finalGross[sym] = weights[sym]×aggressiveness`
-- [ ] **5.2 백테스트 러너** (`pipeline/runBacktest.ts`) — 다중종목 백테스터(2.5) + 파이프라인을 시점마다 호출, 주간 리밸런싱 주기에만 체결, 비용 반영
-- [ ] **5.3 in/out-of-sample + 워크포워드 통합 실행** — 튜닝은 in-sample, OOS는 시험만
-- [ ] **5.4 BacktestRun artifact 산출** (`pipeline/writeArtifact.ts`) — `artifacts/backtests/{id}.json`에 params/universe/dateRange/split/result/oosResult/gate/triesIndex 기록. shape은 `dashboards.md` `BacktestRun`과 정확히 일치
-- [ ] **5.5 CLI 엔트리** (`src/index.ts`) — `run-backtest` 명령(전략·기간·유니버스 인자)
-- [ ] **5.6 E2E(엔진)** — 더미~실제 전략으로 전체 체인이 비용 반영된 BacktestRun을 떨구는지
-- [ ] **5.7 핵심 가설 측정** — 국면 조건부 멀티전략이 always-on/buy&hold 대비 샤프↑·MDD↓ (4.1.7 회수)
+- [x] **5.2 백테스트 러너** (`pipeline/runBacktest.ts`) — 다중종목 백테스터(2.5) + 파이프라인을 시점마다 호출, 주간 리밸런싱 주기에만 체결, 비용 반영
+- [x] **5.3 in/out-of-sample + 워크포워드 통합 실행** — 튜닝은 in-sample, OOS는 시험만
+- [x] **5.4 BacktestRun artifact 산출** (`pipeline/writeArtifact.ts`) — `artifacts/backtests/{id}.json`에 params/universe/dateRange/split/result/oosResult/gate/triesIndex 기록. shape은 `dashboards.md` `BacktestRun`과 정확히 일치
+- [x] **5.5 CLI 엔트리** (`src/index.ts`) — `run-backtest` 명령(전략·기간·유니버스 인자)
+- [x] **5.6 E2E(엔진)** — 더미~실제 전략으로 전체 체인이 비용 반영된 BacktestRun을 떨구는지
+- [x] **5.7 핵심 가설 측정** — 국면 조건부 멀티전략이 always-on/buy&hold 대비 샤프↑·MDD↓ (4.1.7 회수)
 
 **완료 기준**: `npm run` 한 줄로 백테스트 → `artifacts/backtests/`에 JSON. API 키 0개.
 **검증**: `quant-validator` 전체 파이프라인 적대적 검증(look-ahead/비용/과최적화/in-out 누수).

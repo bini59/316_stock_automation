@@ -66,25 +66,30 @@ function normalizeToOne(base: Record<string, number>): Record<string, number> {
 }
 
 /**
- * 패밀리 예산 상한: 같은 family의 base 합이 maxWeightPerFamily를 넘으면
- * 그 패밀리 내부에서 비례 축소(내부 상대비중 보존). reasons에 기록.
+ * 패밀리 예산 상한(절대 상한). **이미 Σ=1로 정규화된** alloc에 적용한다.
+ * 같은 family의 합이 cap을 넘으면 그 패밀리 내부에서 비례 축소하고,
+ * ★ 줄어든 예산은 다른 패밀리로 재분배하지 않고 암묵적 현금으로 둔다
+ * (재정규화로 cap이 무력화되는 구조적 과집중을 차단 — QA H1).
+ * 결과 합은 ≤ 1.
  */
 function applyFamilyBudget(
-  base: Record<string, number>,
+  alloc: Record<string, number>,
   familyByStrategy: Readonly<Record<string, StrategyFamily>>,
   cap: number,
   reasons: string[],
 ): Record<string, number> {
-  // family별 합산
   const familySum: Record<string, number> = {};
-  for (const [s, w] of Object.entries(base)) {
+  for (const [s, w] of Object.entries(alloc)) {
     const fam = familyByStrategy[s] ?? "trend";
     familySum[fam] = (familySum[fam] ?? 0) + (w > 0 ? w : 0);
   }
-  const out: Record<string, number> = { ...base };
+  const out: Record<string, number> = { ...alloc };
   for (const [fam, sum] of Object.entries(familySum)) {
+    // cash 패밀리는 예산 상한 면제: 현금은 리스크의 부재이므로 책을 독식해도 안전
+    // (위기에 전량 현금화가 막히면 안 됨). 상한은 상관된 리스크 베팅에만 적용.
+    if (fam === "cash") continue;
     if (sum > cap && sum > 0) {
-      const scale = cap / sum;
+      const scale = cap / sum; // 패밀리 합을 정확히 cap으로 — 차액은 현금
       for (const [s, w] of Object.entries(out)) {
         if ((familyByStrategy[s] ?? "trend") === fam) out[s] = w * scale;
       }
@@ -183,14 +188,19 @@ export const allocate: Allocate = (
     for (const p of candidates) base[p.strategy] = Math.max(0, p.activation);
   }
 
-  // 2b. 패밀리 예산 상한
-  const budgeted = applyFamilyBudget(base, familyByStrategy, cfg.maxWeightPerFamily, reasons);
-
-  // 2c. 정규화 Σ = 1
-  const strategyAlloc = normalizeToOne(budgeted);
-  if (Object.keys(strategyAlloc).length === 0) {
+  // 2b. 정규화 Σ = 1 (먼저 정규화)
+  const normalized = normalizeToOne(base);
+  if (Object.keys(normalized).length === 0) {
     return { weights: {}, strategyAlloc: {}, reasons: [...reasons, "all strategies zero"] };
   }
+
+  // 2c. 패밀리 예산 절대 상한 (정규화 후 적용, 차액은 현금 → cap 무력화 차단)
+  const strategyAlloc = applyFamilyBudget(
+    normalized,
+    familyByStrategy,
+    cfg.maxWeightPerFamily,
+    reasons,
+  );
 
   // 3. 종목 비중 합성 (같은 종목 자동 병합)
   const synthesized = synthesize(candidates, strategyAlloc);

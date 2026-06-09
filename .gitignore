@@ -20,6 +20,10 @@ coverage/
 artifacts/live/*
 !artifacts/live/.gitkeep
 
+# 백테스트 산출물은 생성물 (소스 아님) — 커밋하지 않음
+artifacts/backtests/*
+!artifacts/backtests/.gitkeep
+
 # 백테스트 데이터 캐시
 .cache/
 data-cache/

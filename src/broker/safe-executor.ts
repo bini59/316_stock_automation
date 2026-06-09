@@ -70,8 +70,17 @@ export class SafeOrderExecutor implements OrderExecutor {
   ): Promise<SafeSubmitOutcome> {
     const decisions: string[] = [];
 
-    // 1) ControlFlags 해석 → 유효 모드. getFlags는 fail-safe로 DRY_RUN을 보장해야 한다.
-    const flags = await this.deps.getFlags();
+    // 1) ControlFlags 해석 → 유효 모드.
+    // ★ fail-safe(QA C1): 의존성(getFlags/getAccount/getOpenOrderIds)이 throw해도
+    //   가드는 절대 throw로 새지 않는다 — 보수적으로 DRY_RUN으로 강등하고 미제출.
+    //   제어 평면이 불건전할 때(원격 플래그·계좌 API 장애)가 가장 위험하므로.
+    let flags: ControlFlags;
+    try {
+      flags = await this.deps.getFlags();
+    } catch (err) {
+      decisions.push(`fail-safe: getFlags 실패 → DRY_RUN (${errMsg(err)})`);
+      return { results: orders.map((o) => unsubmitted(o, "fail-safe: flags 조회 실패")), effectiveMode: "DRY_RUN", decisions };
+    }
     const resolved = resolveMode(requestedMode, flags);
     const effectiveMode = resolved.mode;
     decisions.push(`mode: ${resolved.reason}`);
@@ -80,14 +89,26 @@ export class SafeOrderExecutor implements OrderExecutor {
     const withIds = orders.map((o) => assignClientOrderId(cycleId, o));
 
     // 3) 미체결 대조로 중복 차단
-    const openIds = await this.deps.getOpenOrderIds();
+    let openIds: ReadonlySet<string>;
+    try {
+      openIds = await this.deps.getOpenOrderIds();
+    } catch (err) {
+      decisions.push(`fail-safe: getOpenOrderIds 실패 → DRY_RUN (${errMsg(err)})`);
+      return { results: orders.map((o) => unsubmitted(o, "fail-safe: 미체결 조회 실패")), effectiveMode: "DRY_RUN", decisions };
+    }
     const { toSubmit, blocked } = dedupeAgainstOpen(withIds, openIds);
     for (const b of blocked) {
       decisions.push(`idempotency: 중복 차단 ${b.clientOrderId ?? b.symbol}`);
     }
 
     // 4) 사전 sanity
-    const account = await this.deps.getAccount();
+    let account: AccountState;
+    try {
+      account = await this.deps.getAccount();
+    } catch (err) {
+      decisions.push(`fail-safe: getAccount 실패 → DRY_RUN (${errMsg(err)})`);
+      return { results: orders.map((o) => unsubmitted(o, "fail-safe: 계좌 조회 실패")), effectiveMode: "DRY_RUN", decisions };
+    }
     const sanity = checkSanity(
       toSubmit,
       { account, ...this.deps.sanityContextExtras },
@@ -137,4 +158,8 @@ export class SafeOrderExecutor implements OrderExecutor {
 
 function unsubmitted(order: Order, note: string): OrderResult {
   return { order, submitted: false, filledNotional: 0, note };
+}
+
+function errMsg(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }

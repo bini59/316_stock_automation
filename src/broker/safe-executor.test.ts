@@ -57,6 +57,47 @@ describe("SafeOrderExecutor", () => {
     expect(out.results[0]?.submitted).toBe(true);
   });
 
+  describe("★ QA C1: 의존성 throw 시 fail-safe(예외 전파 금지)", () => {
+    it("getFlags가 throw → DRY_RUN 강등, 미제출", async () => {
+      const safe = new SafeOrderExecutor(
+        makeDeps({
+          getFlags: async () => {
+            throw new Error("flags source down");
+          },
+        }),
+      );
+      const out = await safe.submitGuarded([buyOrder], "LIVE");
+      expect(out.effectiveMode).toBe("DRY_RUN");
+      expect(out.results.every((r) => r.submitted === false)).toBe(true);
+    });
+
+    it("getAccount가 throw → DRY_RUN 강등, 미제출", async () => {
+      const safe = new SafeOrderExecutor(
+        makeDeps({
+          getAccount: async () => {
+            throw new Error("account API timeout");
+          },
+        }),
+      );
+      const out = await safe.submitGuarded([buyOrder], "LIVE");
+      expect(out.effectiveMode).toBe("DRY_RUN");
+      expect(out.results.every((r) => r.submitted === false)).toBe(true);
+    });
+
+    it("getOpenOrderIds가 throw → DRY_RUN 강등, 미제출", async () => {
+      const safe = new SafeOrderExecutor(
+        makeDeps({
+          getOpenOrderIds: async () => {
+            throw new Error("open orders query failed");
+          },
+        }),
+      );
+      const out = await safe.submitGuarded([buyOrder], "LIVE");
+      expect(out.effectiveMode).toBe("DRY_RUN");
+      expect(out.results.every((r) => r.submitted === false)).toBe(true);
+    });
+  });
+
   it("killSwitch → DRY_RUN 강등, 미제출", async () => {
     const safe = new SafeOrderExecutor(
       makeDeps({ getFlags: async () => flags({ killSwitch: true }) }),

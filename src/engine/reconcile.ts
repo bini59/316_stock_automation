@@ -16,6 +16,12 @@ import type { Order } from "../types/order";
 export interface ReconcileConfig {
   /** 무거래 밴드: |delta| < minTradeNotional 이면 거래하지 않는다(USD) */
   readonly minTradeNotional: number;
+  /**
+   * 유니버스 밖 목표비중을 만나면 throw(기본 false: 무시하되 진단 경로 없음).
+   * 메타는 유니버스 안 심볼만 내보내야 하므로, 밖 심볼은 상위 버그 신호다.
+   * fail-fast 원칙(QA M2): true면 조용히 삼키지 않고 예외로 드러낸다.
+   */
+  readonly throwOnOutOfUniverseTarget?: boolean;
 }
 
 /**
@@ -32,6 +38,14 @@ export function reconcile(
   universe: ReadonlySet<string>,
   cfg: ReconcileConfig,
 ): Order[] {
+  // fail-fast: 목표에 유니버스 밖 심볼이 있으면 상위(메타) 버그 → 드러낸다.
+  if (cfg.throwOnOutOfUniverseTarget) {
+    const stray = Object.keys(target).filter((s) => !universe.has(s));
+    if (stray.length > 0) {
+      throw new Error(`reconcile: 유니버스 밖 목표 심볼 ${stray.join(",")} (메타 산출 오류 의심)`);
+    }
+  }
+
   // 유니버스 안에서만 정산한다. 유니버스 밖 보유는 절대 건드리지 않는다.
   const symbols = new Set(
     [...Object.keys(target), ...Object.keys(account.holdings)].filter((s) =>

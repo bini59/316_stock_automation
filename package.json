@@ -8,6 +8,8 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "start": "tsx src/index.ts",
+    "backtest": "tsx src/index.ts run-backtest",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
@@ -24,6 +26,7 @@
     "@vitest/coverage-v8": "^2.0.0",
     "eslint": "^9.0.0",
     "prettier": "^3.3.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   }

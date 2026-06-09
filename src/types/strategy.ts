@@ -40,6 +40,11 @@ export interface StrategyProposal {
   readonly activation: number;
   /** 심볼 → 0..1 */
   readonly weights: Readonly<Record<string, number>>;
+  /**
+   * 전략의 패밀리. 메타 레이어의 패밀리 예산 상한 계산에 쓰인다.
+   * runPool이 RegimeStrategy.family를 그대로 실어 보낸다(이름 추론 대체).
+   */
+  readonly family?: StrategyFamily;
 }
 
 export type StrategyFamily = "trend" | "meanrev" | "defensive" | "cash";

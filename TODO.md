@@ -130,41 +130,41 @@
 > 멤버십·활성도·적극도 함수는 시나리오 단위 테스트로 검산.
 
 ### 4.1 국면 분류 (`src/regime/`) — `docs/strategy/regime.md`
-- [ ] **4.1.1 입력 신호 계산기** (`regime/signals.ts`) — 추세축(`d200`, `slope200`, Kaufman `ER`), 변동성축(`rv20`, `rvPct`, `vixPct`, `termStress`). **전부 trailing window·후행 백분위**
-- [ ] **4.1.2 연속 축 산출** — z표준화(±3σ 윈저라이즈), `trend = tanh(k_t·trendRaw)`, `trendQuality = ER`, `volatility = clamp(...)`
-- [ ] **4.1.3 소프트 멤버십** — bull/bear/chop/crisis 어피니티 → 정규화(합=1), `confidence = 1 − entropy/log4`
-- [ ] **4.1.4 히스테리시스 3중 방어** — ① 소프트 멤버십 ② 입력 EMA 평활(span 7) ③ 하드 라벨 슈미트 트리거(진입 0.50/이탈 0.40) + 체류 K=3일
-- [ ] **4.1.5 `RuleBasedRegimeClassifier`** — `classify(history, ctx?)` 구현, 기본 파라미터(regime.md 7절)
-- [ ] **4.1.6 단위 테스트** — 시나리오 검산(VIX 35+하락추세 → crisis 점화 / 깨끗한 상승 → bull), **look-ahead 테스트**(백분위·EMA가 미래 미참조), whipsaw(경계에서 라벨이 안 튀는지)
+- [x] **4.1.1 입력 신호 계산기** (`regime/signals.ts`) — 추세축(`d200`, `slope200`, Kaufman `ER`), 변동성축(`rv20`, `rvPct`, `vixPct`, `termStress`). **전부 trailing window·후행 백분위**
+- [x] **4.1.2 연속 축 산출** — z표준화(±3σ 윈저라이즈), `trend = tanh(k_t·trendRaw)`, `trendQuality = ER`, `volatility = clamp(...)`
+- [x] **4.1.3 소프트 멤버십** — bull/bear/chop/crisis 어피니티 → 정규화(합=1), `confidence = 1 − entropy/log4`
+- [x] **4.1.4 히스테리시스 3중 방어** — ① 소프트 멤버십 ② 입력 EMA 평활(span 7) ③ 하드 라벨 슈미트 트리거(진입 0.50/이탈 0.40) + 체류 K=3일
+- [x] **4.1.5 `RuleBasedRegimeClassifier`** — `classify(history, ctx?)` 구현, 기본 파라미터(regime.md 7절)
+- [x] **4.1.6 단위 테스트** — 시나리오 검산(VIX 35+하락추세 → crisis 점화 / 깨끗한 상승 → bull), **look-ahead 테스트**(백분위·EMA가 미래 미참조), whipsaw(경계에서 라벨이 안 튀는지)
 - [ ] **4.1.7 간접 검증** — always-on 대비 국면 조건부 스위칭이 샤프↑/MDD↓ (Phase 5 통합 후 측정), 위기 적시성(2018Q4/2020-03/2022)
 
 ### 4.2 전략 풀 (`src/strategies/`) — `docs/strategy/strategy-pool.md`
 > **롱-온리 + 현금** 기본. 공매도는 v2. 주간 리밸런싱 기본.
-- [ ] **4.2.1 풀 라우터** (`strategies/pool.ts`) — `runPool`: `activation = Σ membership×regimeAffinity`, 활성도 태그 후 `StrategyProposal[]`
-- [ ] **4.2.2 추세/모멘텀 패밀리(bull)** — TS 모멘텀, XS 모멘텀(12-1개월, 최근1개월 제외), 듀얼 모멘텀. 공통: 200일선 위만 후보
-- [ ] **4.2.3 평균회귀 패밀리(chop)** — z-스코어 회귀, RSI(2) 회귀, 볼린저 회귀. **국면 게이트 필수**(추세장 칼받기 방지), 200일선 위 과매도만 옵션
-- [ ] **4.2.4 방어 패밀리(bear)** — 저변동 틸트, 방어섹터 로테이션, 현금 레이즈
-- [ ] **4.2.5 현금 패밀리(crisis)** — All-cash(`weights = {}`)
-- [ ] **4.2.6 단위 테스트** — 각 전략 `propose`가 비활성 국면에서 빈/축소 비중, look-ahead 차단, 활성도 블렌딩 부드러움
+- [x] **4.2.1 풀 라우터** (`strategies/pool.ts`) — `runPool`: `activation = Σ membership×regimeAffinity`, 활성도 태그 후 `StrategyProposal[]`
+- [x] **4.2.2 추세/모멘텀 패밀리(bull)** — TS 모멘텀, XS 모멘텀(12-1개월, 최근1개월 제외), 듀얼 모멘텀. 공통: 200일선 위만 후보
+- [x] **4.2.3 평균회귀 패밀리(chop)** — z-스코어 회귀, RSI(2) 회귀, 볼린저 회귀. **국면 게이트 필수**(추세장 칼받기 방지), 200일선 위 과매도만 옵션
+- [x] **4.2.4 방어 패밀리(bear)** — 저변동 틸트, 방어섹터 로테이션, 현금 레이즈
+- [x] **4.2.5 현금 패밀리(crisis)** — All-cash(`weights = {}`)
+- [x] **4.2.6 단위 테스트** — 각 전략 `propose`가 비활성 국면에서 빈/축소 비중, look-ahead 차단, 활성도 블렌딩 부드러움
 - [ ] **4.2.7 검증 포인트** — 국면 게이트 있음/없음 비교(핵심 가설), 리밸런싱 주기별 비용 후 순수익, 다중검정 카운트 기록
 
 ### 4.3 감성·리스크 → 적극도 (`src/sentiment/`) — `docs/strategy/sentiment-risk.md`
 > **AI 없이 완결**되어야 함(`useSentiment:false`가 1급 모드). AI는 경계 밴드 안 미세조정만.
-- [ ] **4.3.1 규칙 베이스라인** (`sentiment/aggressiveness.ts`) — `A_vol = targetVol/realizedVol`, `A_crisis = 1−crisis멤버십`, `A_dd = ddBrake(dd)`, 곱 후 클램프
-- [ ] **4.3.2 AI 오버레이** — 비대칭 밴드(상방 +0.15 / 하방 −0.30), `s_eff = score×confidence`
-- [ ] **4.3.3 그레이스풀 디그레이데이션** — useSentiment=false / undefined / 신선도 초과 / confidence<minConfidence / 예외 → `s_eff=0`(베이스라인만)
-- [ ] **4.3.4 `computeAggressiveness` 순수 함수** — sentiment 없어도 `base` 반환
-- [ ] **4.3.5 (보조 모듈) 감성 파이프라인** — LLM으로 뉴스/공시 텍스트 → `SentimentSignal`(시장 전체 1개, `asOf` 신선도 스탬프 필수). 본 레이어 바깥, 실패해도 중립 흡수. **가격예측 딥러닝 금지**
-- [ ] **4.3.6 단위 테스트** — vol-target 감쇠, crisis→0 수렴, dd 브레이크 선형, AI off==base, 낡은 감성 무시, **look-ahead**(asOf가 의사결정 시점 이전)
+- [x] **4.3.1 규칙 베이스라인** (`sentiment/aggressiveness.ts`) — `A_vol = targetVol/realizedVol`, `A_crisis = 1−crisis멤버십`, `A_dd = ddBrake(dd)`, 곱 후 클램프
+- [x] **4.3.2 AI 오버레이** — 비대칭 밴드(상방 +0.15 / 하방 −0.30), `s_eff = score×confidence`
+- [x] **4.3.3 그레이스풀 디그레이데이션** — useSentiment=false / undefined / 신선도 초과 / confidence<minConfidence / 예외 → `s_eff=0`(베이스라인만)
+- [x] **4.3.4 `computeAggressiveness` 순수 함수** — sentiment 없어도 `base` 반환
+- [x] **4.3.5 (보조 모듈) 감성 파이프라인** — LLM으로 뉴스/공시 텍스트 → `SentimentSignal`(시장 전체 1개, `asOf` 신선도 스탬프 필수). 본 레이어 바깥, 실패해도 중립 흡수. **가격예측 딥러닝 금지**
+- [x] **4.3.6 단위 테스트** — vol-target 감쇠, crisis→0 수렴, dd 브레이크 선형, AI off==base, 낡은 감성 무시, **look-ahead**(asOf가 의사결정 시점 이전)
 - [ ] **4.3.7 검증** — A/B(on vs off): off가 견고한가 + on이 샤프·MDD를 유의하게 개선하나, 노이즈 주입 강건성, 비대칭(하방만) 검증
 
 ### 4.4 메타 배분 (`src/meta/`) — `docs/strategy/meta-allocation.md`
 > **상대 비중만**(Σ≤1). 핵심은 상관 중복 베팅 제거.
-- [ ] **4.4.1 v1 활성도+패밀리 예산** (`meta/allocate.ts`) — 후보필터(minActivation) → base=activation → 패밀리 예산 상한(maxWeightPerFamily) 내 비례축소 → normalize
-- [ ] **4.4.2 종목 비중 합성 + 포지션 가드** — `w[sym]=Σ strategyAlloc×proposal.weights`, maxWeightPerSymbol 상한, 재정규화(Σ≤1, 차액은 암묵 현금)
-- [ ] **4.4.3 `allocate` 순수 함수** — strategyReturns 없으면 v1로 폴백
-- [ ] **4.4.4 v2 상관 기반 다양화(교체 가능)** — 리스크패리티/HRP/상관페널티. **상관은 trailing 수익률로만, 성과추종 금지(강한 shrinkage 없이는)**
-- [ ] **4.4.5 단위 테스트** — 패밀리 예산 상한, 종목 집중 상한, 같은 종목 합산 병합, **look-ahead**(상관이 미래 미참조)
+- [x] **4.4.1 v1 활성도+패밀리 예산** (`meta/allocate.ts`) — 후보필터(minActivation) → base=activation → 패밀리 예산 상한(maxWeightPerFamily) 내 비례축소 → normalize
+- [x] **4.4.2 종목 비중 합성 + 포지션 가드** — `w[sym]=Σ strategyAlloc×proposal.weights`, maxWeightPerSymbol 상한, 재정규화(Σ≤1, 차액은 암묵 현금)
+- [x] **4.4.3 `allocate` 순수 함수** — strategyReturns 없으면 v1로 폴백
+- [x] **4.4.4 v2 상관 기반 다양화(교체 가능)** — 리스크패리티/HRP/상관페널티. **상관은 trailing 수익률로만, 성과추종 금지(강한 shrinkage 없이는)**
+- [x] **4.4.5 단위 테스트** — 패밀리 예산 상한, 종목 집중 상한, 같은 종목 합산 병합, **look-ahead**(상관이 미래 미참조)
 - [ ] **4.4.6 검증** — 메타 vs naive Σ: 유효 베팅 수(1/Σwᵢ²)↑·집중도↓·MDD↓, v1 vs v2, 턴오버(Σ|Δw|)
 
 **검증 게이트(전략 레이어 전체)**: `quant-validator` — look-ahead 누출, 거래비용 후 생존, 다중검정 보정, 레이어 간 계약 정합. **성과가 너무 좋으면 반드시 호출.**
@@ -194,14 +194,14 @@
 > 전략 스택은 토스를 **모른다**. 추상 포트 + mock으로 전체 파이프라인을 키 없이 완성.
 > **백테스트와 실거래가 동일한 `reconcile` 로직을 공유**한다. 안전장치가 1급 시민.
 
-- [ ] **6.1 mock 어댑터** (`src/broker/mock/`) — `SimulatedAccount`, `SimulatedMarketData`, `SimulatedExecutor`. **look-ahead 유지**(현재 시점까지만 노출)
-- [ ] **6.2 정산** (`engine/reconcile.ts`) — `reconcile(target, account, universe, cfg)`: **유니버스 안만**, 금액 기반(`notional`), **무거래 밴드**(`minTradeNotional` 이하 무시), exit/rebalance reason
-- [ ] **6.3 정산 단위 테스트** — 유니버스 밖 보유 불간섭, 목표−현재 델타, 밴드 churn 방지, 안 가진 종목도 목표면 매수
-- [ ] **6.4 실행 모드** (`ExecMode`) — BACKTEST/DRY_RUN/LIVE_SMALL/LIVE. **DRY_RUN=계산·로깅만, 미제출**(페이퍼 대체)
-- [ ] **6.5 안전장치(코드 강제)** — 킬스위치(→DRY_RUN 강등+미체결 취소), 주문 한도(1회/일일 금액·건수 캡), 고액주문 플래그(>1천만원 confirmHighValueOrder), **멱등성**(클라이언트 식별자+미체결 조회 대조로 중복주문 차단), 사전 sanity(가격 이탈/매도≤보유/매수≤buying-power), 장중/휴장 가드, **fail-safe**(플래그 읽기 실패→DRY_RUN)
-- [ ] **6.6 ControlFlags 폴링** — 엔진이 매 사이클 `artifacts/live/control.json` 폴링해서 따름. 손상 시 보수적 DRY_RUN
-- [ ] **6.7 LiveSnapshot 산출** — 매 사이클 `artifacts/live/`에 떨굼(account/regime/aggressiveness/targetWeights/openOrders/recentDecisions/pnl)
-- [ ] **6.8 안전장치 단위 테스트** — 킬스위치, 멱등성(중복 제출 안 됨), sanity 거부, 모드 승급 가드
+- [x] **6.1 mock 어댑터** (`src/broker/mock/`) — `SimulatedAccount`, `SimulatedMarketData`, `SimulatedExecutor`. **look-ahead 유지**(현재 시점까지만 노출)
+- [x] **6.2 정산** (`engine/reconcile.ts`) — `reconcile(target, account, universe, cfg)`: **유니버스 안만**, 금액 기반(`notional`), **무거래 밴드**(`minTradeNotional` 이하 무시), exit/rebalance reason
+- [x] **6.3 정산 단위 테스트** — 유니버스 밖 보유 불간섭, 목표−현재 델타, 밴드 churn 방지, 안 가진 종목도 목표면 매수
+- [x] **6.4 실행 모드** (`ExecMode`) — BACKTEST/DRY_RUN/LIVE_SMALL/LIVE. **DRY_RUN=계산·로깅만, 미제출**(페이퍼 대체)
+- [x] **6.5 안전장치(코드 강제)** — 킬스위치(→DRY_RUN 강등+미체결 취소), 주문 한도(1회/일일 금액·건수 캡), 고액주문 플래그(>1천만원 confirmHighValueOrder), **멱등성**(클라이언트 식별자+미체결 조회 대조로 중복주문 차단), 사전 sanity(가격 이탈/매도≤보유/매수≤buying-power), 장중/휴장 가드, **fail-safe**(플래그 읽기 실패→DRY_RUN)
+- [x] **6.6 ControlFlags 폴링** — 엔진이 매 사이클 `artifacts/live/control.json` 폴링해서 따름. 손상 시 보수적 DRY_RUN
+- [x] **6.7 LiveSnapshot 산출** — 매 사이클 `artifacts/live/`에 떨굼(account/regime/aggressiveness/targetWeights/openOrders/recentDecisions/pnl)
+- [x] **6.8 안전장치 단위 테스트** — 킬스위치, 멱등성(중복 제출 안 됨), sanity 거부, 모드 승급 가드
 - [ ] **6.9 보안 리뷰** — `security-reviewer`: OAuth 비밀·주문 경로
 
 **완료 기준**: mock으로 BACKTEST/DRY_RUN 전 파이프라인이 주문 계획까지 돈다. LiveSnapshot/ControlFlags 산출.

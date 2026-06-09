@@ -33,3 +33,7 @@ data-cache/
 *.log
 .vscode/
 .idea/
+
+# 튜닝 산출물도 생성물
+artifacts/tuning/*
+!artifacts/tuning/.gitkeep

@@ -61,10 +61,32 @@ export async function writeBacktestRun(
   run: BacktestRun,
   dir = "artifacts/backtests",
 ): Promise<string> {
+  return atomicWriteJson(path.join(dir, `${run.id}.json`), run, dir);
+}
+
+/** 튜닝 결과 artifact — 웹이 읽어 비교 테이블을 그린다. */
+export interface TuningArtifact {
+  id: string;
+  createdAt: number;
+  universe: readonly string[];
+  dateRange: { from: number; to: number };
+  /** 최적 BacktestRun id(상세 차트는 이 run을 참조) */
+  bestRunId: string;
+  result: import("./tune").TuneResult;
+}
+
+/** artifacts/tuning/{id}.json 에 기록(원자적). */
+export async function writeTuningResult(
+  artifact: TuningArtifact,
+  dir = "artifacts/tuning",
+): Promise<string> {
+  return atomicWriteJson(path.join(dir, `${artifact.id}.json`), artifact, dir);
+}
+
+async function atomicWriteJson(file: string, data: unknown, dir: string): Promise<string> {
   await mkdir(dir, { recursive: true });
-  const file = path.join(dir, `${run.id}.json`);
   const tmp = `${file}.tmp`;
-  await writeFile(tmp, JSON.stringify(run, null, 2), "utf8");
+  await writeFile(tmp, JSON.stringify(data, null, 2), "utf8");
   const { rename } = await import("node:fs/promises");
   await rename(tmp, file);
   return file;

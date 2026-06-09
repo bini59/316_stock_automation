@@ -10,6 +10,12 @@ export type {
   SplitBacktestOutput,
   RegimePoint,
 } from "./runBacktest";
-export { buildBacktestRun, writeBacktestRun } from "./writeArtifact";
-export type { BuildBacktestRunOptions } from "./writeArtifact";
-export { defaultBacktestConfig } from "./defaults";
+export { buildBacktestRun, writeBacktestRun, writeTuningResult } from "./writeArtifact";
+export type { BuildBacktestRunOptions, TuningArtifact } from "./writeArtifact";
+export {
+  defaultBacktestConfig,
+  DEFAULT_ALLOCATION_CFG,
+  DEFAULT_AGGRESSIVENESS_CFG,
+} from "./defaults";
+export { tune, DEFAULT_TUNE_GRID } from "./tune";
+export type { TuneParams, TuneGrid, TuneConfig, TuneResult } from "./tune";

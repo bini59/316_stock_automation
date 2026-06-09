@@ -28,3 +28,5 @@ export {
 export type { CacheStore } from "./cache";
 export { splitInOutSample } from "./splitter";
 export type { InOutSplit } from "./splitter";
+export { YahooBarLoader, parseYahoo } from "./yahoo";
+export type { YahooLoaderConfig, FetchLike } from "./yahoo";

@@ -14,3 +14,6 @@ next-env.d.ts
 
 # local artifacts copied for dev
 /.dev-artifacts/
+
+# E2E 런타임 artifact(생성물)
+e2e/.artifacts/

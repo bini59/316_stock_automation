@@ -200,12 +200,12 @@ function TuningResultTable({ artifact }: { artifact: TuningArtifact }) {
                 <th className="num">SPY B&amp;H (전체)</th>
                 <th className="num">기본 (전체)</th>
                 <th className="num">기본 (IS)</th>
-                <th className="num" style={{ color: "#eab308" }}>
+                <th className="num" style={{ color: "#c4123f" }}>
                   기본 (OOS)
                 </th>
                 <th className="num">튜닝 (전체)</th>
                 <th className="num">튜닝 (IS)</th>
-                <th className="num" style={{ color: "#fde047" }}>
+                <th className="num" style={{ color: "#c4123f" }}>
                   튜닝 (OOS)
                 </th>
               </tr>
@@ -216,12 +216,12 @@ function TuningResultTable({ artifact }: { artifact: TuningArtifact }) {
                 <td className="num">{signedPct(r.buyHold.totalReturn)}</td>
                 <td className="num">{signedPct(r.baseline.full.totalReturn)}</td>
                 <td className="num">{signedPct(r.baseline.inSample.totalReturn)}</td>
-                <td className="num" style={{ color: "#eab308" }}>
+                <td className="num" style={{ color: "#c4123f" }}>
                   {signedPct(r.baseline.oos.totalReturn)}
                 </td>
                 <td className="num">{signedPct(r.tuned.full.totalReturn)}</td>
                 <td className="num dim">{signedPct(r.tuned.inSample.totalReturn)}</td>
-                <td className="num" style={{ color: "#fde047" }}>
+                <td className="num" style={{ color: "#c4123f" }}>
                   {signedPct(r.tuned.oos.totalReturn)}
                 </td>
               </tr>
@@ -230,12 +230,12 @@ function TuningResultTable({ artifact }: { artifact: TuningArtifact }) {
                 <td className="num">{num(r.buyHold.sharpe, 2)}</td>
                 <td className="num">{num(r.baseline.full.sharpe, 2)}</td>
                 <td className="num">{num(r.baseline.inSample.sharpe, 2)}</td>
-                <td className="num" style={{ color: "#eab308" }}>
+                <td className="num" style={{ color: "#c4123f" }}>
                   {num(r.baseline.oos.sharpe, 2)}
                 </td>
                 <td className="num">{num(r.tuned.full.sharpe, 2)}</td>
                 <td className="num dim">{num(r.tuned.inSample.sharpe, 2)}</td>
-                <td className="num" style={{ color: "#fde047" }}>
+                <td className="num" style={{ color: "#c4123f" }}>
                   {num(r.tuned.oos.sharpe, 2)}
                 </td>
               </tr>
@@ -244,12 +244,12 @@ function TuningResultTable({ artifact }: { artifact: TuningArtifact }) {
                 <td className="num">{pct(r.buyHold.maxDrawdown)}</td>
                 <td className="num">{pct(r.baseline.full.maxDrawdown)}</td>
                 <td className="num">{pct(r.baseline.inSample.maxDrawdown)}</td>
-                <td className="num" style={{ color: "#eab308" }}>
+                <td className="num" style={{ color: "#c4123f" }}>
                   {pct(r.baseline.oos.maxDrawdown)}
                 </td>
                 <td className="num">{pct(r.tuned.full.maxDrawdown)}</td>
                 <td className="num dim">{pct(r.tuned.inSample.maxDrawdown)}</td>
-                <td className="num" style={{ color: "#fde047" }}>
+                <td className="num" style={{ color: "#c4123f" }}>
                   {pct(r.tuned.oos.maxDrawdown)}
                 </td>
               </tr>
@@ -312,7 +312,7 @@ function TuningResultTable({ artifact }: { artifact: TuningArtifact }) {
         <div className="row" style={{ alignItems: "baseline", gap: 16 }}>
           <div
             className="metric-value"
-            style={{ color: overfitBad ? "#ef4444" : undefined }}
+            style={{ color: overfitBad ? "#c4123f" : undefined }}
           >
             {num(overfit, 2)}
           </div>

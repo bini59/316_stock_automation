@@ -87,11 +87,13 @@ export function BacktestClient() {
 
   return (
     <div data-testid="backtest-page">
-      <h1 className="page-title">백테스트 확인·보정</h1>
-      <p className="page-sub">
-        엔진 산출물(BacktestRun)을 읽어 보여준다. 여기서 매매를 계산하지 않는다 —
-        보정 규율만 시각적으로 강제한다.
-      </p>
+      <div className="hero-band">
+        <h1 className="page-title">백테스트 확인·보정</h1>
+        <p className="page-sub" style={{ marginBottom: 0 }}>
+          엔진 산출물(BacktestRun)을 읽어 보여준다. 여기서 매매를 계산하지 않는다
+          — 보정 규율만 시각적으로 강제한다.
+        </p>
+      </div>
 
       <div className="tabs" role="tablist">
         <button

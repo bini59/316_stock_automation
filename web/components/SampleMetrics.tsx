@@ -25,7 +25,7 @@ export function SampleMetrics({ inSample, oos }: Props) {
         <tr>
           <th>지표</th>
           <th className="num">In-sample</th>
-          <th className="num" style={{ color: "#eab308" }}>
+          <th className="num" style={{ color: "#c4123f" }}>
             Out-of-sample
           </th>
         </tr>
@@ -35,7 +35,7 @@ export function SampleMetrics({ inSample, oos }: Props) {
           <tr key={row.label}>
             <td>{row.label}</td>
             <td className="num">{row.render(inSample)}</td>
-            <td className="num" style={{ color: oos ? "#fde047" : undefined }}>
+            <td className="num" style={{ color: oos ? "#c4123f" : undefined }}>
               {oos ? row.render(oos) : "—"}
             </td>
           </tr>

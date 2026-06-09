@@ -49,14 +49,14 @@ export function EquityChart({ run, height = 360 }: Props) {
       height,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "#9aa7b4",
+        textColor: "#64748d", // ink-mute
       },
       grid: {
-        vertLines: { color: "#2a3340" },
-        horzLines: { color: "#2a3340" },
+        vertLines: { color: "#e3e8ee" }, // hairline
+        horzLines: { color: "#e3e8ee" },
       },
-      rightPriceScale: { borderColor: "#2a3340" },
-      timeScale: { borderColor: "#2a3340", timeVisible: false },
+      rightPriceScale: { borderColor: "#e3e8ee" },
+      timeScale: { borderColor: "#e3e8ee", timeVisible: false },
       crosshair: { mode: 1 },
       autoSize: true,
     });
@@ -82,9 +82,9 @@ export function EquityChart({ run, height = 360 }: Props) {
       value: v,
     });
 
-    // in-sample 라인 (밝은 파랑)
+    // in-sample 라인 (인디고 primary)
     const inSeries = chart.addLineSeries({
-      color: "#3b82f6",
+      color: "#533afd",
       lineWidth: 2,
       priceLineVisible: false,
       lastValueVisible: false,
@@ -93,10 +93,10 @@ export function EquityChart({ run, height = 360 }: Props) {
       curve.slice(0, Math.min(splitIndex + 1, n)).map((v, i) => toPoint(v, i)),
     );
 
-    // out-of-sample 라인 (경고색 amber) — 보는 순간 in-sample 이 된다.
+    // out-of-sample 라인 (ruby 강조) — 보는 순간 in-sample 이 된다.
     if (splitIndex < n) {
       const outSeries = chart.addLineSeries({
-        color: "#eab308",
+        color: "#ea2261",
         lineWidth: 2,
         priceLineVisible: false,
         lastValueVisible: true,
@@ -110,7 +110,7 @@ export function EquityChart({ run, height = 360 }: Props) {
       // OOS 경계 수직선
       inSeries.createPriceLine({
         price: curve[splitIndex] ?? curve[n - 1] ?? 0,
-        color: "#eab308",
+        color: "#ea2261",
         lineStyle: LineStyle.Dashed,
         lineWidth: 1,
         axisLabelVisible: false,
@@ -126,14 +126,14 @@ export function EquityChart({ run, height = 360 }: Props) {
       markers.push({
         time: entryT,
         position: "belowBar",
-        color: "#60a5fa",
+        color: "#665efd", // primary-soft
         shape: "arrowUp",
         text: "진입",
       });
       markers.push({
         time: exitT,
         position: "aboveBar",
-        color: t.pnl >= 0 ? "#22c55e" : "#ef4444",
+        color: t.pnl >= 0 ? "#0f8a4a" : "#ea2261",
         shape: "arrowDown",
         text: t.pnl >= 0 ? "익절" : "손절",
       });
@@ -155,20 +155,20 @@ export function EquityChart({ run, height = 360 }: Props) {
       <div ref={containerRef} style={{ width: "100%", height }} />
       <div className="legend">
         <span>
-          <span className="swatch" style={{ background: "#3b82f6" }} />
+          <span className="swatch" style={{ background: "#533afd" }} />
           In-sample (튜닝 허용)
         </span>
         <span>
-          <span className="swatch" style={{ background: "#eab308" }} />
+          <span className="swatch" style={{ background: "#ea2261" }} />
           Out-of-sample (보지만 말 것)
         </span>
         <span>
-          <span className="swatch" style={{ background: "#60a5fa" }} />
+          <span className="swatch" style={{ background: "#665efd" }} />
           진입
         </span>
         <span>
-          <span className="swatch" style={{ background: "#22c55e" }} />
-          익절 / <span className="swatch" style={{ background: "#ef4444" }} />{" "}
+          <span className="swatch" style={{ background: "#0f8a4a" }} />
+          익절 / <span className="swatch" style={{ background: "#ea2261" }} />{" "}
           손절
         </span>
       </div>

@@ -62,23 +62,25 @@ export function LiveClient() {
 
   return (
     <div data-testid="live-page">
-      <div className="row" style={{ marginBottom: 8 }}>
-        <h1 className="page-title" style={{ margin: 0 }}>
-          실거래 모니터링
-        </h1>
-        <span className={`mode-badge mode-${s.mode}`} data-testid="mode-badge">
-          {s.mode}
-        </span>
-        {data.source === "mock" ? (
-          <span className="badge warn" data-testid="mock-badge">
-            MOCK 데이터 (토스 키 확보 전)
+      <div className="hero-band">
+        <div className="row" style={{ marginBottom: 8 }}>
+          <h1 className="page-title" style={{ margin: 0 }}>
+            실거래 모니터링
+          </h1>
+          <span className={`mode-badge mode-${s.mode}`} data-testid="mode-badge">
+            {s.mode}
           </span>
-        ) : null}
+          {data.source === "mock" ? (
+            <span className="badge warn" data-testid="mock-badge">
+              MOCK 데이터 (토스 키 확보 전)
+            </span>
+          ) : null}
+        </div>
+        <p className="page-sub" style={{ marginBottom: 0 }}>
+          엔진 LiveSnapshot 을 읽어 보여준다. 유일한 쓰기는 운영 제어(킬스위치
+          등). 스냅샷 기준: {dateTime(s.asOf)}
+        </p>
       </div>
-      <p className="page-sub">
-        엔진 LiveSnapshot 을 읽어 보여준다. 유일한 쓰기는 운영 제어(킬스위치 등).
-        스냅샷 기준: {dateTime(s.asOf)}
-      </p>
 
       <PnlRow snapshot={s} />
 
@@ -188,7 +190,7 @@ function RegimePanel({ snapshot }: { snapshot: LiveSnapshot }) {
           className="badge"
           style={{
             background: REGIME_COLORS[regime.label],
-            color: "#0b0f14",
+            color: "#ffffff",
             borderColor: "transparent",
             fontSize: 14,
           }}

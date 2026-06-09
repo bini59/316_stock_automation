@@ -13,7 +13,7 @@ export function TriesCounter({ triesIndex }: Props) {
 
   return (
     <div>
-      <div className="metric" style={{ borderColor: severe ? "#eab308" : undefined }}>
+      <div className="metric" style={{ borderColor: severe ? "#c4123f" : undefined }}>
         <div className="label">다중검정 — 이 전략 시도 횟수</div>
         <div className="value big" data-testid="tries-index">
           #{triesIndex}

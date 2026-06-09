@@ -1,19 +1,66 @@
+/* ───────────────────────────────────────────────────────────────────────────
+ * Stripi 디자인 시스템 (docs/coding/design.md) — 금융 데이터 대시보드 적용.
+ * 인디고 CTA·딥네이비 ink·tabular 숫자·pill 버튼·그래디언트 헤더 밴드.
+ * 외형 전용: 기능/데이터 흐름은 변경 없음.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --bg: #0b0f14;
-  --bg-elev: #131922;
-  --bg-card: #1a212c;
-  --border: #2a3340;
-  --text: #e6edf3;
-  --text-dim: #9aa7b4;
-  --text-faint: #6b7785;
-  --accent: #3b82f6;
-  --pos: #22c55e;
-  --neg: #ef4444;
-  --warn: #eab308;
-  --danger: #dc2626;
-  --pass: #16a34a;
-  --fail: #dc2626;
-  --radius: 10px;
+  /* Brand & Accent */
+  --primary: #533afd;
+  --primary-deep: #4434d4;
+  --primary-press: #2e2b8c;
+  --primary-soft: #665efd;
+  --primary-subdued: #b9b9f9;
+  --brand-dark-900: #1c1e54;
+  --ruby: #ea2261;
+  --magenta: #f96bee;
+  --lemon: #9b6829;
+
+  /* Surface */
+  --canvas: #ffffff;
+  --canvas-soft: #f6f9fc;
+  --canvas-cream: #f5e9d4;
+  --hairline: #e3e8ee;
+  --hairline-input: #a8c3de;
+
+  /* Text */
+  --ink: #0d253d;
+  --ink-secondary: #273951;
+  --ink-mute: #64748d;
+  --ink-mute-2: #61718a;
+  --on-primary: #ffffff;
+
+  /* Semantic (dashboard-product UI 한정 — 의미 유지) */
+  --pos: #0f8a4a;
+  --neg: var(--ruby);
+  --warn: #9b6829;
+  --pass: #0f8a4a;
+  --fail: var(--ruby);
+
+  /* Shape */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-pill: 9999px;
+
+  /* Elevation */
+  --shadow-1: rgba(0, 55, 112, 0.08) 0 1px 3px;
+  --shadow-2:
+    rgba(0, 55, 112, 0.08) 0 8px 24px, rgba(0, 55, 112, 0.04) 0 2px 6px;
+
+  /* legacy aliases (컴포넌트 잔여 var 참조 호환) */
+  --bg: var(--canvas);
+  --bg-elev: var(--canvas-soft);
+  --bg-card: var(--canvas);
+  --border: var(--hairline);
+  --text: var(--ink);
+  --text-dim: var(--ink-mute);
+  --text-faint: var(--ink-mute-2);
+  --accent: var(--primary);
+  --danger: var(--ruby);
+  --radius: var(--r-lg);
 }
 
 * {
@@ -24,80 +71,128 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--canvas);
+  color: var(--ink);
   font-family:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
+    var(--font-inter), "SF Pro Display", system-ui, -apple-system, sans-serif;
+  font-size: 15px; /* body-md */
+  font-weight: 300; /* thin weight is the brand */
+  line-height: 1.4;
+  font-feature-settings: "ss01"; /* ss01 globally */
+  -webkit-font-smoothing: antialiased;
 }
 
-a {
-  color: var(--accent);
+a,
+.link {
+  color: var(--primary);
   text-decoration: none;
 }
 a:hover {
   text-decoration: underline;
 }
 
+/* ── Navigation ─────────────────────────────────────────────────────────── */
 .app-nav {
   display: flex;
   align-items: center;
   gap: 24px;
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-elev);
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--canvas);
 }
 .app-nav .brand {
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: -0.2px;
+  color: var(--ink);
 }
 .app-nav .links {
   display: flex;
-  gap: 16px;
+  gap: 8px;
 }
 .app-nav .links a {
-  color: var(--text-dim);
-  padding: 4px 10px;
-  border-radius: 6px;
+  color: var(--ink-mute-2);
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 300;
+}
+.app-nav .links a:hover {
+  text-decoration: none;
+  color: var(--ink);
 }
 .app-nav .links a.active {
-  color: var(--text);
-  background: var(--bg-card);
+  color: var(--primary);
+  background: var(--primary-subdued);
 }
 
+/* ── Layout ─────────────────────────────────────────────────────────────── */
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px 24px 64px;
+}
+
+/* 그래디언트 헤더 밴드 (히어로 메시 근사 — cream→orange→lavender→indigo→ruby) */
+.hero-band {
+  position: relative;
+  border-radius: var(--r-xl);
+  padding: 32px 28px;
+  margin-bottom: 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 140% at 0% 30%, #f5e9d4 0%, rgba(245, 233, 212, 0) 45%),
+    radial-gradient(120% 160% at 28% 20%, #f7c9a3 0%, rgba(247, 201, 163, 0) 42%),
+    radial-gradient(140% 160% at 55% 60%, #c9b8fb 0%, rgba(201, 184, 251, 0) 50%),
+    radial-gradient(140% 180% at 78% 30%, #665efd 0%, rgba(102, 94, 253, 0) 52%),
+    linear-gradient(100deg, #f96bee 0%, #ea2261 100%);
+  border: 1px solid var(--hairline);
+}
+.hero-band > * {
+  position: relative;
+  z-index: 1;
+}
+.hero-band .page-title,
+.hero-band .page-sub {
+  color: var(--ink);
+}
+.hero-band .page-sub {
+  max-width: 760px;
 }
 
 .page-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0 0 4px;
+  font-size: 32px; /* display-lg */
+  font-weight: 300;
+  letter-spacing: -0.64px;
+  line-height: 1.1;
+  margin: 0 0 8px;
+  color: var(--ink);
 }
 .page-sub {
-  color: var(--text-dim);
+  color: var(--ink-secondary);
+  font-size: 15px;
+  font-weight: 300;
   margin: 0 0 20px;
 }
 
+/* ── Cards & Containers ─────────────────────────────────────────────────── */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-1);
 }
 .card + .card {
   margin-top: 18px;
 }
 .card-title {
-  font-size: 13px;
+  font-size: 13px; /* caption */
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-faint);
-  margin: 0 0 14px;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  color: var(--ink-mute);
+  margin: 0 0 16px;
 }
 
 .grid {
@@ -120,31 +215,37 @@ a:hover {
   }
 }
 
-/* metric card */
+/* ── Metric card (dashboard-mockup tabular money type) ──────────────────── */
 .metric {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
+  background: var(--canvas-soft);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: 16px;
 }
 .metric .label {
-  font-size: 12px;
-  color: var(--text-faint);
+  font-size: 10px; /* micro-cap */
+  color: var(--ink-mute);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 500;
 }
 .metric .value {
-  font-size: 24px;
-  font-weight: 700;
-  margin-top: 4px;
+  font-size: 26px; /* display-md */
+  font-weight: 300;
+  letter-spacing: -0.26px;
+  margin-top: 6px;
+  color: var(--ink);
+  font-feature-settings: "ss01", "tnum"; /* money cells: tabular */
 }
 .metric .value.big {
-  font-size: 34px;
+  font-size: 32px;
+  letter-spacing: -0.64px;
 }
 .metric .hint {
-  font-size: 12px;
-  color: var(--text-dim);
-  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-mute);
+  margin-top: 6px;
+  font-weight: 300;
 }
 
 .pos {
@@ -154,159 +255,209 @@ a:hover {
   color: var(--neg);
 }
 .zero {
-  color: var(--text-dim);
+  color: var(--ink-mute);
 }
 
-/* badges */
+/* ── Badges ─────────────────────────────────────────────────────────────── */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  border: 1px solid var(--hairline);
+  color: var(--ink-secondary);
+  background: var(--canvas);
 }
 .badge.pass {
-  background: rgba(22, 163, 74, 0.15);
-  color: #4ade80;
-  border-color: rgba(22, 163, 74, 0.4);
+  background: rgba(15, 138, 74, 0.1);
+  color: var(--pos);
+  border-color: rgba(15, 138, 74, 0.3);
 }
 .badge.fail {
-  background: rgba(220, 38, 38, 0.15);
-  color: #f87171;
-  border-color: rgba(220, 38, 38, 0.4);
+  background: rgba(234, 34, 97, 0.1);
+  color: var(--ruby);
+  border-color: rgba(234, 34, 97, 0.32);
 }
 .badge.warn {
-  background: rgba(234, 179, 8, 0.15);
-  color: #fde047;
-  border-color: rgba(234, 179, 8, 0.4);
+  background: var(--canvas-cream);
+  color: var(--lemon);
+  border-color: rgba(155, 104, 41, 0.3);
 }
 
-/* mode badge */
+/* ── Mode badge ─────────────────────────────────────────────────────────── */
 .mode-badge {
   display: inline-block;
   padding: 8px 18px;
-  border-radius: 8px;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  border-radius: var(--r-pill);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 .mode-DRY_RUN {
-  background: rgba(59, 130, 246, 0.18);
-  color: #93c5fd;
-  border: 2px solid #3b82f6;
+  background: var(--primary-subdued);
+  color: var(--primary-deep);
+  border: 1px solid var(--primary);
 }
 .mode-LIVE_SMALL {
-  background: rgba(234, 179, 8, 0.18);
-  color: #fde047;
-  border: 2px solid #eab308;
+  background: var(--canvas-cream);
+  color: var(--lemon);
+  border: 1px solid rgba(155, 104, 41, 0.5);
 }
 .mode-LIVE {
-  background: rgba(220, 38, 38, 0.2);
-  color: #fca5a5;
-  border: 2px solid #dc2626;
+  background: rgba(234, 34, 97, 0.12);
+  color: var(--ruby);
+  border: 1px solid var(--ruby);
 }
 
-/* warning banner — calibration discipline */
+/* ── Warning banners — calibration discipline ──────────────────────────── */
 .banner {
-  border-radius: var(--radius);
+  border-radius: var(--r-md);
   padding: 12px 16px;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 300;
   margin-bottom: 16px;
-  border: 1px solid;
+  border: 1px solid var(--hairline);
+  background: var(--canvas-soft);
+  color: var(--ink-secondary);
 }
 .banner.warn {
-  background: rgba(234, 179, 8, 0.1);
-  border-color: rgba(234, 179, 8, 0.4);
-  color: #fde047;
+  background: var(--canvas-cream);
+  border-color: rgba(155, 104, 41, 0.3);
+  color: #5c4318;
 }
 .banner.danger {
-  background: rgba(220, 38, 38, 0.12);
-  border-color: rgba(220, 38, 38, 0.45);
-  color: #fca5a5;
+  background: rgba(234, 34, 97, 0.08);
+  border-color: rgba(234, 34, 97, 0.32);
+  color: #a4123f;
+}
+.banner strong {
+  font-weight: 500;
 }
 
-/* tables */
+/* ── Tables (tabular money type) ───────────────────────────────────────── */
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 14px; /* body-tabular */
+  font-weight: 300;
 }
 th,
 td {
   text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border);
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink-secondary);
 }
 th {
-  color: var(--text-faint);
-  font-weight: 600;
+  color: var(--ink-mute);
+  font-weight: 500;
   text-transform: uppercase;
   font-size: 11px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 td.num,
 th.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  letter-spacing: -0.42px;
 }
 
-/* buttons */
+/* ── Buttons — all pills ───────────────────────────────────────────────── */
 button {
   font: inherit;
+  font-weight: 400;
   cursor: pointer;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-elev);
-  color: var(--text);
-  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--primary);
+  background: var(--canvas);
+  color: var(--primary);
+  padding: 8px 16px;
+  min-height: 40px;
+  font-size: 14px;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
 }
-button:hover {
-  border-color: var(--text-faint);
+button:hover:not(:disabled) {
+  background: var(--primary-subdued);
+}
+button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* 킬스위치 — on-dark pill, 가장 단순·확실. armed(=ON) 은 ruby 경고. */
 button.kill {
-  background: var(--danger);
-  border-color: #ef4444;
-  color: #fff;
-  font-weight: 700;
-  font-size: 16px;
-  padding: 14px 22px;
+  background: var(--brand-dark-900);
+  border-color: var(--brand-dark-900);
+  color: var(--on-primary);
+  font-weight: 500;
+  font-size: 15px;
+  padding: 14px 24px;
+}
+button.kill:hover:not(:disabled) {
+  background: #14163f;
 }
 button.kill.armed {
-  background: var(--pos);
-  border-color: var(--pos);
+  background: var(--ruby);
+  border-color: var(--ruby);
+  color: var(--on-primary);
 }
-button.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+button.kill.armed:hover:not(:disabled) {
+  background: #cf1a52;
+}
+
+/* primary filled pill (밴드당 하나) */
+button.primary,
+.btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+  font-weight: 500;
+}
+button.primary:hover:not(:disabled),
+.btn.primary:hover:not(:disabled) {
+  background: var(--primary-press);
+  border-color: var(--primary-press);
 }
 
 select {
   font: inherit;
-  background: var(--bg-elev);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 10px;
+  font-weight: 300;
+  background: var(--canvas);
+  color: var(--ink);
+  border: 1px solid var(--hairline-input);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  min-height: 40px;
+}
+select:focus-visible {
+  outline: none;
+  border-color: var(--primary);
 }
 
 .empty {
   text-align: center;
-  color: var(--text-dim);
-  padding: 48px 24px;
+  color: var(--ink-mute);
+  padding: 56px 24px;
+  font-weight: 300;
 }
 .empty code {
-  background: var(--bg-elev);
+  background: var(--canvas-soft);
   padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--text);
+  border-radius: var(--r-xs);
+  color: var(--ink);
+  font-size: 13px;
 }
 
 .row {
@@ -319,25 +470,29 @@ select {
   flex: 1;
 }
 .dim {
-  color: var(--text-dim);
+  color: var(--ink-mute);
+  font-weight: 300;
 }
 .mono {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  font-feature-settings: "tnum";
 }
 
 .legend {
   display: flex;
   gap: 14px;
   flex-wrap: wrap;
-  font-size: 12px;
-  color: var(--text-dim);
+  font-size: 13px;
+  color: var(--ink-mute);
   margin-top: 10px;
+  font-weight: 300;
 }
 .legend .swatch {
   display: inline-block;
   width: 12px;
   height: 12px;
-  border-radius: 3px;
+  border-radius: var(--r-xs);
   margin-right: 5px;
   vertical-align: middle;
 }
@@ -350,84 +505,93 @@ select {
   font-size: 12px;
 }
 .log-list li {
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-dim);
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink-secondary);
 }
 
-/* ── 실행 폼 / 탭 / 버튼 (백테스트·튜닝 트리거 UI) ───────────────────────── */
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
 .tabs {
   display: flex;
   gap: 6px;
-  margin: 0 0 18px;
-  border-bottom: 1px solid var(--border);
+  margin: 0 0 20px;
+  border-bottom: 1px solid var(--hairline);
 }
 .tab {
   background: transparent;
   border: 0;
   border-bottom: 2px solid transparent;
-  color: var(--text-dim);
-  padding: 8px 16px;
-  font-size: 14px;
+  border-radius: 0;
+  color: var(--ink-mute);
+  padding: 10px 16px;
+  min-height: 40px;
+  font-size: 15px;
+  font-weight: 300;
   cursor: pointer;
 }
-.tab:hover {
-  color: var(--text);
+.tab:hover:not(:disabled) {
+  background: transparent;
+  color: var(--ink);
 }
 .tab.active {
-  color: var(--text);
-  border-bottom-color: var(--accent);
+  color: var(--primary);
+  border-bottom-color: var(--primary);
 }
 
+/* secondary outline pill (실행 트리거 버튼 등) */
 .btn {
-  background: var(--bg-elev);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: var(--canvas);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--r-pill);
   padding: 8px 16px;
+  min-height: 40px;
   font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
 }
 .btn:hover:not(:disabled) {
-  border-color: var(--accent);
+  background: var(--primary-subdued);
 }
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
-.btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-  font-weight: 600;
-}
 
+/* ── Inputs ────────────────────────────────────────────────────────────── */
 .field {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 .field input {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  padding: 6px 10px;
-  font-size: 14px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline-input);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  padding: 8px 12px;
+  min-height: 40px;
+  font-size: 15px;
+  font-weight: 300;
+  font-feature-settings: "tnum";
 }
 .field input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 
 .metric-value {
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 300;
+  letter-spacing: -0.42px;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "ss01", "tnum";
 }
 
 .danger-card {
-  border-color: var(--danger);
+  border-color: rgba(234, 34, 97, 0.45);
+  box-shadow: var(--shadow-1);
 }
 
 .spinner {
@@ -435,8 +599,8 @@ select {
   width: 12px;
   height: 12px;
   margin-right: 8px;
-  border: 2px solid var(--text-faint);
-  border-top-color: var(--accent);
+  border: 2px solid var(--hairline-input);
+  border-top-color: var(--primary);
   border-radius: 50%;
   vertical-align: middle;
   animation: spin 0.8s linear infinite;

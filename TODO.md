@@ -67,41 +67,41 @@
 > look-ahead·비용누락)을 거르는 장치다. **지표 공식·게이트·look-ahead·비용은 TDD 필수.**
 
 ### 2.1 Broker 비용 모델 (`engine/broker.ts`)
-- [ ] `BrokerConfig` 시장 분리 버전 구현 — `market:"KR"|"US"`, commissionRate/taxRate/feeRate/fxSpread/slippageRate (`execution-and-data.md` 7절)
-- [ ] `fillBuy`/`fillSell`(슬리피지), `cost(side, notional)`(수수료+세금+fee+fx) 구현
-- [ ] **US 기본 프로필** 제공(매도세 0, SEC/TAF fee류, FX 스프레드), KR 프로필은 골격만
-- [ ] 단위 테스트: 매수/매도 비용이 항상 양수로 빠져나가는지, US/KR 분기
+- [x] `BrokerConfig` 시장 분리 버전 구현 — `market:"KR"|"US"`, commissionRate/taxRate/feeRate/fxSpread/slippageRate (`execution-and-data.md` 7절)
+- [x] `fillBuy`/`fillSell`(슬리피지), `cost(side, notional)`(수수료+세금+fee+fx) 구현
+- [x] **US 기본 프로필** 제공(매도세 0, SEC/TAF fee류, FX 스프레드), KR 프로필은 골격만
+- [x] 단위 테스트: 매수/매도 비용이 항상 양수로 빠져나가는지, US/KR 분기
 
 ### 2.2 포트폴리오 추적 (`engine/portfolio.ts`)
-- [ ] 다중 종목 포지션·현금·평가액 추적 (불변 패턴, 상태 변이 금지)
-- [ ] NAV 계산(현금 + 유니버스 보유 평가액) — `account.ts` 정의와 일치
-- [ ] 단위 테스트: 매수/매도 후 현금·수량·평가액 정합
+- [x] 다중 종목 포지션·현금·평가액 추적 (불변 패턴, 상태 변이 금지)
+- [x] NAV 계산(현금 + 유니버스 보유 평가액) — `account.ts` 정의와 일치
+- [x] 단위 테스트: 매수/매도 후 현금·수량·평가액 정합
 
 ### 2.3 지표 계산 (`validation/metrics.ts`)
-- [ ] `computeMetrics(equityCurve, trades)` — totalReturn, **sharpe(연율화)**, **maxDrawdown(0..1)**, winRate, tradeCount
-- [ ] 단위 테스트: 알려진 입력에 대한 샤프·MDD 정답 검산(예: 단조 상승 → MDD 0)
+- [x] `computeMetrics(equityCurve, trades)` — totalReturn, **sharpe(연율화)**, **maxDrawdown(0..1)**, winRate, tradeCount
+- [x] 단위 테스트: 알려진 입력에 대한 샤프·MDD 정답 검산(예: 단조 상승 → MDD 0)
 
 ### 2.4 합격 게이트 (`validation/gates.ts`)
-- [ ] `evaluateGate(metrics, criteria)` — `validation.md` 코드 그대로, 실패 사유 문자열 기록
-- [ ] **다중검정 보정 훅** — `triesIndex`가 클수록 기준을 엄격히 적용하는 로직(또는 호출부 정책)
-- [ ] 단위 테스트: minSharpe/maxDrawdown/minTradeCount 각 실패 케이스
+- [x] `evaluateGate(metrics, criteria)` — `validation.md` 코드 그대로, 실패 사유 문자열 기록
+- [x] **다중검정 보정 훅** — `triesIndex`가 클수록 기준을 엄격히 적용하는 로직(또는 호출부 정책)
+- [x] 단위 테스트: minSharpe/maxDrawdown/minTradeCount 각 실패 케이스
 
 ### 2.5 백테스터 루프 (`engine/backtester.ts`)
-- [ ] `backtest(strategy, data, broker, initialCapital)` — `interfaces.md` 골격 기반 단일종목 버전
-- [ ] **매 시점 `data.slice(0, i+1)`로만 전략 노출** (look-ahead 1차 방어선)
-- [ ] 모든 체결이 `Broker`를 거치도록 강제(비용 누락 구조적 차단)
-- [ ] equityCurve·trades 산출 후 `computeMetrics` 호출
-- [ ] **★ look-ahead 단위 테스트**: i 시점 호출 결과가 i 이후 데이터에 의존하지 않음을 데이터 잘라 넣어 증명
-- [ ] **다중종목 백테스터** — `portfolio.ts`로 포지션 관리 분리, `UniverseHistory` + target-weight 입력 받는 버전(파이프라인 통합용)
+- [x] `backtest(strategy, data, broker, initialCapital)` — `interfaces.md` 골격 기반 단일종목 버전
+- [x] **매 시점 `data.slice(0, i+1)`로만 전략 노출** (look-ahead 1차 방어선)
+- [x] 모든 체결이 `Broker`를 거치도록 강제(비용 누락 구조적 차단)
+- [x] equityCurve·trades 산출 후 `computeMetrics` 호출
+- [x] **★ look-ahead 단위 테스트**: i 시점 호출 결과가 i 이후 데이터에 의존하지 않음을 데이터 잘라 넣어 증명
+- [x] **다중종목 백테스터** — `portfolio.ts`로 포지션 관리 분리, `UniverseHistory` + target-weight 입력 받는 버전(파이프라인 통합용)
 
 ### 2.6 데이터 분할 (`validation/`+`data/splitter.ts`)
-- [ ] `splitInOutSample(series, ratio=0.7~0.8)` — in/out-of-sample 경계(`split.inSampleEnd`) 산출
-- [ ] **OOS 데이터는 튜닝에 절대 노출 금지** 규약을 코드 주석·구조로 명시
+- [x] `splitInOutSample(series, ratio=0.7~0.8)` — in/out-of-sample 경계(`split.inSampleEnd`) 산출
+- [x] **OOS 데이터는 튜닝에 절대 노출 금지** 규약을 코드 주석·구조로 명시
 
 ### 2.7 워크포워드 분석 (`validation/walkForward.ts`)
-- [ ] rolling window: "N년 학습 → M개월 검증 → 창을 앞으로 굴려 반복"
-- [ ] 구간별 metrics 집계 + 일관성 리포트
-- [ ] 단위 테스트: 창 분할 경계가 미래를 안 넘는지
+- [x] rolling window: "N년 학습 → M개월 검증 → 창을 앞으로 굴려 반복"
+- [x] 구간별 metrics 집계 + 일관성 리포트
+- [x] 단위 테스트: 창 분할 경계가 미래를 안 넘는지
 
 **완료 기준**: 더미 전략(예: 항상 HOLD, 또는 단순 buy&hold)으로 백테스트가 비용 반영된 결과를 내고, look-ahead 테스트가 통과.
 **검증**: `quant-validator` — "비용이 정말 빠지는가, look-ahead 누출 없는가, 샤프/MDD 공식이 맞는가" 적대적 점검.

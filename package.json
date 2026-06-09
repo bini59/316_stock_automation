@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "tsx src/index.ts",
     "backtest": "tsx src/index.ts run-backtest",
+    "tune": "tsx scripts/tune.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
